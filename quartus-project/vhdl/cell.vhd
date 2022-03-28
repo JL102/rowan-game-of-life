@@ -36,7 +36,7 @@ architecture rtl of cell is
 	end component;
 	
 	signal D, Q : std_logic; -- D flip flop i/o
-	signal sum : std_logic_vector (2 downto 0); -- number of bits that are '1'
+	signal sum : std_logic_vector (2 downto 0); -- number of bits that are '1' 000
 begin
 	state <= Q; 	-- Output the state from the DFF
 	
@@ -47,9 +47,19 @@ begin
 				Q <= start_as;
 			else 
 				-- this is where all the magic will happen
-				-- this is where the fun begins
-				Q <= '0';
+				-- Use counter to implement each state?
+				-- any live cell with two or three neighbors survive
+				if(state = 1 && (sum = 2 || sum = 3)) then
+					Q <= 1;
+				-- Any dead cell with 3 live neighbors becomes alive
+				elsif(state = 0 && sum = 3) then
+					Q <= 1;
+				-- Otherwise set as dead
+				else
+					Q <= 0;
+				end if;
 			end if;
 		end if;
+		state <= Q;
 	end process;
 end rtl;
