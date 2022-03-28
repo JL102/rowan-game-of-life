@@ -7,6 +7,16 @@ use ieee.numeric_std.all;
 --- 0		4
 ---	1	2	3
 
+-- Border Cells (Edge Case 1):
+--- |	4	3
+---	|	X	2
+---	|	0	1	 
+
+-- Corner Cells (Edge Case 2):
+--- _	_	_
+---	|	X	2
+---	|	0	1	
+
 entity cell is
 	port(
 		clk : 		in std_logic;
@@ -37,6 +47,7 @@ begin
 				Q <= start_as;
 			else 
 				-- this is where all the magic will happen
+				-- this is where the fun begins
 				Q <= '0';
 			end if;
 		end if;
