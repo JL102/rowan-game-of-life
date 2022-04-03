@@ -4,8 +4,8 @@
 
 set_global_assignment -name FAMILY "Cyclone V"
 set_global_assignment -name DEVICE 5CSXFC6D6F31C6
-set_global_assignment -name TOP_LEVEL_ENTITY cell
-set_global_assignment -name ORIGINAL_QUARTUS_VERSION "16.0.2"
+set_global_assignment -name TOP_LEVEL_ENTITY block_test_1280x1024
+set_global_assignment -name ORIGINAL_QUARTUS_VERSION 16.0.2
 set_global_assignment -name LAST_QUARTUS_VERSION "18.1.0 Lite Edition"
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "19:26:18 MARCH 21,2022"
 set_global_assignment -name DEVICE_FILTER_PACKAGE FBGA
@@ -149,16 +149,11 @@ set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH cell_testbench 
 set_global_assignment -name EDA_TEST_BENCH_NAME cell_testbench -section_id eda_simulation
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id cell_testbench
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME cell_testbench -section_id cell_testbench
-set_global_assignment -name VHDL_FILE vhdl/four_bit_counter.vhd
-set_global_assignment -name VHDL_FILE vhdl/eight_bit_counter.vhd
-set_global_assignment -name VHDL_FILE vhdl/flipflop.vhd
-set_global_assignment -name VHDL_FILE vhdl/cell.vhd
-set_global_assignment -name VHDL_FILE Project.vhd
-set_global_assignment -name VHDL_FILE vhdl/full_adder.vhd
-set_global_assignment -name SDC_FILE Project.SDC
 set_global_assignment -name EDA_TEST_BENCH_NAME counter_testbench -section_id eda_simulation
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id counter_testbench
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME counter_testbench -section_id counter_testbench
+set_global_assignment -name EDA_TEST_BENCH_FILE testbenches/cell_testbench.vhd -section_id cell_testbench
+set_global_assignment -name EDA_TEST_BENCH_FILE testbenches/counter_testbench.vhd -section_id counter_testbench
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
@@ -258,6 +253,13 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to VGA_R[6]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to VGA_R[7]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to VGA_SYNC_N
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to VGA_VS
-set_global_assignment -name EDA_TEST_BENCH_FILE testbenches/cell_testbench.vhd -section_id cell_testbench
-set_global_assignment -name EDA_TEST_BENCH_FILE testbenches/counter_testbench.vhd -section_id counter_testbench
+set_global_assignment -name VHDL_FILE vhdl/package_types.vhd
+set_global_assignment -name VHDL_FILE vhdl/block_test_1280x1024.vhd
+set_global_assignment -name VHDL_FILE vhdl/four_bit_counter.vhd
+set_global_assignment -name VHDL_FILE vhdl/eight_bit_counter.vhd
+set_global_assignment -name VHDL_FILE vhdl/flipflop.vhd
+set_global_assignment -name VHDL_FILE vhdl/cell.vhd
+set_global_assignment -name VHDL_FILE Project.vhd
+set_global_assignment -name VHDL_FILE vhdl/full_adder.vhd
+set_global_assignment -name SDC_FILE Project.SDC
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
