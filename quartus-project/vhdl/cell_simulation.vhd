@@ -16,7 +16,8 @@ entity cell_simulation is
 	port(
 		clk : 		in std_logic;
 		reset : 	in std_logic; -- Whether to reset to the starting state
-		start_as :  in array_states
+		start_as :  in array_states;
+		states : 	out array_states
 --		start_as : 	in std_logic_vector(15 downto 0); -- Starting state
 --		adj : 		in std_logic_vector(7 downto 0) -- Adjacent cells' states
 --		states: 	out std_logic_vector(15 downto 0) -- Present state
@@ -32,8 +33,6 @@ architecture rtl of cell_simulation is
 			adj : 		in std_logic_vector(7 downto 0);
 			state: 		out std_logic);
 	end component;
-	
-	signal states : array_states;
 begin
 	
 	gen_rows :

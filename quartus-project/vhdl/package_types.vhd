@@ -7,6 +7,8 @@ use STD.TEXTIO.all;
 -- 	define our own types in a similar manner. (because online VHDL resources were
 -- 	not helpful at this).
 -- 	Simply include package_types in the project and add: use ieee.package_types.all;
+
+-- C:\intelFPGA_lite\18.1\quartus\libraries\vhdl\ieee\2008
 package package_types is
 	
 	constant MAX_ROW : integer := 5;
