@@ -18,3 +18,5 @@ incremental_db
 simulation
 modelsim
 db
+node_modules
+output_code.txt
