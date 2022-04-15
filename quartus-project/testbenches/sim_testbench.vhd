@@ -25,18 +25,50 @@ begin
 	process
 	begin
 		reset <= '1';
-		-- Glider from playgameoflife.com
-		start_as(2, 1) <= '1';
-		start_as(3, 2) <= '1';
-		start_as(1, 3) <= '1';
-		start_as(2, 3) <= '1';
-		start_as(3, 3) <= '1';
+		-- Use roms/makerom.js to get testbench code from an image
+		
+		start_as(27, 2) <= '1';
+		start_as(25, 3) <= '1';
+		start_as(27, 3) <= '1';
+		start_as(15, 4) <= '1';
+		start_as(16, 4) <= '1';
+		start_as(23, 4) <= '1';
+		start_as(24, 4) <= '1';
+		start_as(37, 4) <= '1';
+		start_as(38, 4) <= '1';
+		start_as(14, 5) <= '1';
+		start_as(18, 5) <= '1';
+		start_as(23, 5) <= '1';
+		start_as(24, 5) <= '1';
+		start_as(37, 5) <= '1';
+		start_as(38, 5) <= '1';
+		start_as(3, 6) <= '1';
+		start_as(4, 6) <= '1';
+		start_as(13, 6) <= '1';
+		start_as(19, 6) <= '1';
+		start_as(23, 6) <= '1';
+		start_as(24, 6) <= '1';
+		start_as(3, 7) <= '1';
+		start_as(4, 7) <= '1';
+		start_as(13, 7) <= '1';
+		start_as(17, 7) <= '1';
+		start_as(19, 7) <= '1';
+		start_as(20, 7) <= '1';
+		start_as(25, 7) <= '1';
+		start_as(27, 7) <= '1';
+		start_as(13, 8) <= '1';
+		start_as(19, 8) <= '1';
+		start_as(27, 8) <= '1';
+		start_as(14, 9) <= '1';
+		start_as(18, 9) <= '1';
+		start_as(15, 10) <= '1';
+		start_as(16, 10) <= '1';
 		
 		
 		wait for 10 ns;
 		reset <= '0';
 		
-		wait for 200 ns;
+		wait for 600 ns;
 		
 		assert false report "Test: OK" severity failure;
 	end process;
