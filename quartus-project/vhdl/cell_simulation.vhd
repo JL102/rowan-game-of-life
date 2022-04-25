@@ -15,10 +15,12 @@ use work.package_types.all; -- see package_types.vhd
 
 entity cell_simulation is
 	port(
-		clk : 		in std_logic;
-		reset : 	in std_logic; -- Whether to reset to the starting state
-		start_as :  in array_states
-		; states : 	inout array_states
+		clk 			:	in std_logic;
+		reset 			: 	in std_logic; -- Whether to reset to the starting state
+		start_as_arr	:	in array_states;
+		enable			:	in std_logic;
+		clk_div_ctrl	:	in unsigned(2 downto 0);
+	    states 			: 	inout array_states
 --		start_as : 	in std_logic_vector(15 downto 0); -- Starting state
 --		adj : 		in std_logic_vector(7 downto 0) -- Adjacent cells' states
 --		states: 	out std_logic_vector(15 downto 0) -- Present state
@@ -28,11 +30,13 @@ end cell_simulation;
 architecture rtl of cell_simulation is
 	
 	component cell is
-		port(clk : 		in std_logic;
-			reset : 	in std_logic;
-			start_as : 	in std_logic;
-			adj : 		in std_logic_vector(7 downto 0);
-			state: 		out std_logic);
+		port(clk 			:	in 	std_logic;
+			reset 			: 	in 	std_logic;
+			start_as 		: 	in 	std_logic;
+			enable			:	in 	std_logic;
+			adj 			: 	in 	std_logic_vector(7 downto 0);
+			clk_div_ctrl	:	in unsigned(2 downto 0);
+			state			:	out std_logic);
 	end component;
 	
 	-- signal states : array_states;
@@ -47,19 +51,21 @@ begin
 			-- top left corner
 			gen_if1 : if row = 0 and col = 0 generate
 				gen_cell : cell port map (
-					clk => clk, reset => reset, 
-					start_as => start_as(row, col),
+					clk => clk, reset => reset, enable => enable,
+					clk_div_ctrl => clk_div_ctrl,
+					start_as => start_as_arr(row, col),
 					adj(0) => '0', adj(1) => '0',				  adj(2) => '0',
 					adj(3) => '0',								  adj(4) => states(row,   col+1),
 					adj(5) => '0', adj(6) => states(row+1, col),  adj(7) => states(row+1, col+1),
-					state => states(row,   col)
+					state => states(row, col)
 				);
 			end generate gen_if1;
 			-- top right corner
 			gen_if2 : if row = 0 and col = MAX_COL generate
 				gen_cell : cell port map (
-					clk => clk, reset => reset, 
-					start_as => start_as(row, col),
+					clk => clk, reset => reset, enable => enable,
+					clk_div_ctrl => clk_div_ctrl,
+					start_as => start_as_arr(row, col),
 					adj(0) => '0', 					adj(1) => '0', 				  adj(2) => '0',
 					adj(3) => states(row,   col-1),								  adj(4) => '0',
 					adj(5) => states(row+1, col-1), adj(6) => states(row+1, col), adj(7) => '0',
@@ -69,8 +75,9 @@ begin
 			-- bottom left corner
 			gen_if3 : if row = MAX_ROW and col = 0 generate
 				gen_cell : cell port map (
-					clk => clk, reset => reset, 
-					start_as => start_as(row, col),
+					clk => clk, reset => reset, enable => enable,
+					clk_div_ctrl => clk_div_ctrl,
+					start_as => start_as_arr(row, col),
 					adj(0) => '0', adj(1) => states(row-1, col), 	adj(2) => states(row-1, col+1),
 					adj(3) => '0',								  	adj(4) => states(row,   col+1),
 					adj(5) => '0', adj(6) => '0',					adj(7) => '0',
@@ -80,8 +87,9 @@ begin
 			-- bottom right corner
 			gen_if4 : if row = MAX_ROW and col = MAX_COL generate
 				gen_cell : cell port map (
-					clk => clk, reset => reset, 
-					start_as => start_as(row, col),
+					clk => clk, reset => reset, enable => enable,
+					clk_div_ctrl => clk_div_ctrl,
+					start_as => start_as_arr(row, col),
 					adj(0) => states(row-1, col-1), adj(1) => states(row-1, col), adj(2) => '0',
 					adj(3) => states(row,   col-1),								  adj(4) => '0',
 					adj(5) => '0', adj(6) => '0', adj(7) => '0',
@@ -91,8 +99,9 @@ begin
 			-- top edge
 			gen_if5 : if row = 0 and row < MAX_ROW and col > 0 and col < MAX_COL generate
 				gen_cell : cell port map (
-					clk => clk, reset => reset, 
-					start_as => start_as(row, col),
+					clk => clk, reset => reset, enable => enable,
+					clk_div_ctrl => clk_div_ctrl,
+					start_as => start_as_arr(row, col),
 					adj(0) => '0', adj(1) => '0', adj(2) => '0',
 					adj(3) => states(row,   col-1),								  adj(4) => states(row,   col+1),
 					adj(5) => states(row+1, col-1), adj(6) => states(row+1, col), adj(7) => states(row+1, col+1),
@@ -102,8 +111,9 @@ begin
 			-- bottom edge
 			gen_if6 : if row = MAX_ROW and col > 0 and col < MAX_COL generate
 				gen_cell : cell port map (
-					clk => clk, reset => reset, 
-					start_as => start_as(row, col),
+					clk => clk, reset => reset, enable => enable,
+					clk_div_ctrl => clk_div_ctrl,
+					start_as => start_as_arr(row, col),
 					adj(0) => states(row-1, col-1), adj(1) => states(row-1, col), adj(2) => states(row-1, col+1),
 					adj(3) => states(row,   col-1),								  adj(4) => states(row,   col+1),
 					adj(5) => '0', 					adj(6) => '0', 				  adj(7) => '0',
@@ -113,8 +123,9 @@ begin
 			-- left edge
 			gen_if7 : if row > 0 and row < MAX_ROW and col = 0 generate
 				gen_cell : cell port map (
-					clk => clk, reset => reset, 
-					start_as => start_as(row, col),
+					clk => clk, reset => reset, enable => enable,
+					clk_div_ctrl => clk_div_ctrl,
+					start_as => start_as_arr(row, col),
 					adj(0) => '0', adj(1) => states(row-1, col), adj(2) => states(row-1, col+1),
 					adj(3) => '0',								 adj(4) => states(row,   col+1),
 					adj(5) => '0', adj(6) => states(row+1, col), adj(7) => states(row+1, col+1),
@@ -124,8 +135,9 @@ begin
 			-- right edge
 			gen_if8 : if row > 0 and row < MAX_ROW and col = MAX_COL generate
 				gen_cell : cell port map (
-					clk => clk, reset => reset, 
-					start_as => start_as(row, col),
+					clk => clk, reset => reset, enable => enable,
+					clk_div_ctrl => clk_div_ctrl,
+					start_as => start_as_arr(row, col),
 					adj(0) => states(row-1, col-1), adj(1) => states(row-1, col), adj(2) => '0',
 					adj(3) => states(row,   col-1),								  adj(4) => '0',
 					adj(5) => states(row+1, col-1), adj(6) => states(row+1, col), adj(7) => '0',
@@ -136,8 +148,9 @@ begin
 			-- center of the grid
 			gen_if9 : if row > 0 and row < MAX_ROW and col > 0 and col < MAX_COL generate
 				gen_cell : cell port map (
-					clk => clk, reset => reset, 
-					start_as => start_as(row, col),
+					clk => clk, reset => reset, enable => enable,
+					clk_div_ctrl => clk_div_ctrl,
+					start_as => start_as_arr(row, col),
 					adj(0) => states(row-1, col-1), adj(1) => states(row-1, col), adj(2) => states(row-1, col+1),
 					adj(3) => states(row,   col-1),								  adj(4) => states(row,   col+1),
 					adj(5) => states(row+1, col-1), adj(6) => states(row+1, col), adj(7) => states(row+1, col+1),

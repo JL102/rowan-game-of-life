@@ -20,11 +20,13 @@ use ieee.numeric_std.all;
 
 entity cell is
 	port(
-		clk : 		in std_logic;
-		reset : 	in std_logic; -- Whether to reset to the starting state
-		start_as : 	in std_logic; -- Starting state
-		adj : 		in std_logic_vector(7 downto 0); -- Adjacent cells' states
-		state: 		out std_logic -- Present state
+		clk 			: 	in std_logic;
+		reset 			: 	in std_logic; -- Whether to reset to the starting state
+		start_as 		: 	in std_logic; -- Starting state
+		enable			:	in std_logic; -- Enable for to turn clock divider on and off
+		adj 			: 	in std_logic_vector(7 downto 0); -- Adjacent cells' states
+		clk_div_ctrl	:	in unsigned(2 downto 0); -- clock divider control bits (speed of clock)
+		state			: 	out std_logic -- Present state
 		
 		-- ; sum: inout std_logic_vector(3 downto 0) -- for debugging
 	);
@@ -36,15 +38,28 @@ architecture rtl of cell is
 		port (bits : in std_logic_vector(7 downto 0);
 			num : out std_logic_vector(3 downto 0));
 	end component;
+
+	component clock_div is
+		port(
+			clk		:	in 	std_logic;
+			enable	:	in	std_logic;
+			reset	:	in	std_logic;
+			control	:	in 	unsigned(2 downto 0);
+			clk_out	:	out	std_logic
+		);
+	end component; 
 	
 	signal sum : std_logic_vector (3 downto 0); -- number of bits that are '1' 000
+    signal reset        :   std_logic := '0';
+	signal clk_out		:	std_logic;
 begin
 	
 	Counter : eight_bit_counter port map(adj, sum); -- Use the eight bit counter to identify the number of adjacent live cells
 	
-	process(clk)
+	clk_div	: clock_div(clk, enable, reset, clk_div_ctrl, clk_out);
+	process(clk_out)
 	begin
-		if rising_edge(clk) then
+		if rising_edge(clk_out) then
 			
 			-- When the reset line is on, initialize the cell based on its "start_as" control line
 			if reset = '1' then
