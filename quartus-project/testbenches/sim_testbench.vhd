@@ -95,6 +95,7 @@ begin
 		reset <= '0';
 		wait for 100 ns;
 
+		wait for 3000 ns;
 		
 		assert false report "Test: OK" severity failure;
 	end process;

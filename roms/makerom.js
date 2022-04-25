@@ -16,6 +16,7 @@ async function main() {
 		process.exit(1);
 	}
 	
+	// Load the image and get its width & height
 	const image = await Jimp.read(imagePath);
 	const width = image.bitmap.width;
 	const height = image.bitmap.height;

@@ -1,22 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
---Comment Added
-
--- Adjacent cells: (possibly up for modification)
---- 7	6	5
---- 0		4
----	1	2	3
-
--- Border Cells (Edge Case 1):
---- |	4	3
----	|	X	2
----	|	0	1	 
-
--- Corner Cells (Edge Case 2):
---- _	_	_
----	|	X	2
----	|	0	1	
 
 entity cell is
 	port(
@@ -27,17 +11,15 @@ entity cell is
 		adj 			: 	in std_logic_vector(7 downto 0); -- Adjacent cells' states
 		clk_div_ctrl	:	in unsigned(2 downto 0); -- clock divider control bits (speed of clock)
 		state			: 	out std_logic -- Present state
-		
-		-- ; sum: inout std_logic_vector(3 downto 0) -- for debugging
 	);
 end cell;
 
 architecture rtl of cell is
 	
-	component eight_bit_counter is
-		port (bits : in std_logic_vector(7 downto 0);
-			num : out std_logic_vector(3 downto 0));
-	end component;
+	-- component eight_bit_counter is
+	-- 	port (bits : in std_logic_vector(7 downto 0);
+	-- 		num : out std_logic_vector(3 downto 0));
+	-- end component;
 
 	component clock_div is
 		port(
@@ -49,16 +31,25 @@ architecture rtl of cell is
 		);
 	end component; 
 	
-	signal sum 			: std_logic_vector (3 downto 0); -- number of bits that are '1' 000
+	-- signal sum 			: std_logic_vector (3 downto 0); -- number of bits that are '1' 000
 	signal clk_out		:	std_logic;
 begin
 	
-	Counter : eight_bit_counter port map(adj, sum); -- Use the eight bit counter to identify the number of adjacent live cells
+	-- signal sum : unsigned (3 downto 0); -- number of bits that are '1' 000
+begin	
+	-- Counter : eight_bit_counter port map(adj, sum); -- Use the eight bit counter to identify the number of adjacent live cells
 	
 	clk_div : clock_div port map(clk, enable, reset, clk_div_ctrl, clk_out);
+	variable sum : unsigned(3 downto 0) := "0000";
 	process(clk_out)
 	begin
 		if rising_edge(clk_out) then
+			sum := "0000";   --initialize count variable.
+			for i in 0 to 7 loop   --check for all the bits.
+				if(adj(i) = '1') then --check if the bit is '1'
+					sum := sum + 1; --if its one, increment the count.
+				end if;
+			end loop;
 			
 			-- When the reset line is on, initialize the cell based on its "start_as" control line
 			if reset = '1' then
@@ -72,24 +63,6 @@ begin
 			end if;
 			-- In any other condition (EXACTLY 2 adjacent live cells), 
 			-- 	dead cells stay dead and live cells stay alive (this is a no-op)
-			
-			-- if reset = '1' then
-			-- 	state <= start_as;
-			-- else
-			-- 	-- this is where all the magic will happen
-			-- 	-- Use counter to implement each state?
-				
-			-- 	-- -- any live cell with two or three neighbors survive
-			-- 	-- if(state = 1 and (sum = 2 or sum = 3)) then
-			-- 	-- 	Q <= 1;
-			-- 	-- -- Any dead cell with 3 live neighbors becomes alive
-			-- 	-- elsif(state = 0 and sum = 3) then
-			-- 	-- 	Q <= 1;
-			-- 	-- -- Otherwise set as dead
-			-- 	-- else
-			-- 	-- 	Q <= 0;
-			-- 	-- end if;
-			-- end if;
 		end if;
 	end process;
 end rtl;
