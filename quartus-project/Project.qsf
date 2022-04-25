@@ -258,14 +258,9 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to VGA_R[7]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to VGA_SYNC_N
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to VGA_VS
 set_global_assignment -name VHDL_FILE vhdl/clock_div.vhd
-set_global_assignment -name VHDL_FILE vhdl/button_debouncer.vhd
-set_global_assignment -name VHDL_FILE vhdl/button_controller.vhd
-set_global_assignment -name VHDL_FILE vhdl/block_of_four.vhd
 set_global_assignment -name VHDL_FILE testbenches/sim_testbench.vhd
 set_global_assignment -name VHDL_FILE testbenches/counter_testbench.vhd
 set_global_assignment -name VHDL_FILE testbenches/cell_testbench.vhd
-set_global_assignment -name SDC_FILE Project.sdc
-set_global_assignment -name VHDL_FILE top.vhd
 set_global_assignment -name VHDL_FILE vhdl/work/package_types.vhd
 set_global_assignment -name VHDL_FILE vhdl/cell_simulation.vhd
 set_global_assignment -name VHDL_FILE vhdl/package_types.vhd

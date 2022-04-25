@@ -20,7 +20,7 @@ architecture tb of sim_testbench is
 	-- signal adjacents : std_logic_vector(7 downto 0);
 	-- signal sum : std_logic_vector(3 downto 0);
 begin
-	clk <= not clk after 5 ns;
+	clk <= not clk after 1 ns;
 	
 	-- start_as(0) <= ('0', '1', '0', '0', '0', '0');
 	-- Apply stimulus and check the results
@@ -66,7 +66,7 @@ begin
 		start_as(15, 10) <= '1';
 		start_as(16, 10) <= '1';
 		
-		clk_div_ctrl <= '001';
+		clk_div_ctrl <= "001";
 		wait for 10 ns;
 		reset <= '0';
 		

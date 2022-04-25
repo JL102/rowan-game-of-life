@@ -43,20 +43,19 @@ architecture rtl of cell is
 		port(
 			clk		:	in 	std_logic;
 			enable	:	in	std_logic;
-			reset	:	in	std_logic;
+			reset		:	in	std_logic;
 			control	:	in 	unsigned(2 downto 0);
 			clk_out	:	out	std_logic
 		);
 	end component; 
 	
-	signal sum : std_logic_vector (3 downto 0); -- number of bits that are '1' 000
-    signal reset        :   std_logic := '0';
+	signal sum 			: std_logic_vector (3 downto 0); -- number of bits that are '1' 000
 	signal clk_out		:	std_logic;
 begin
 	
 	Counter : eight_bit_counter port map(adj, sum); -- Use the eight bit counter to identify the number of adjacent live cells
 	
-	clk_div	: clock_div(clk, enable, reset, clk_div_ctrl, clk_out);
+	clk_div : clock_div port map(clk, enable, reset, clk_div_ctrl, clk_out);
 	process(clk_out)
 	begin
 		if rising_edge(clk_out) then
