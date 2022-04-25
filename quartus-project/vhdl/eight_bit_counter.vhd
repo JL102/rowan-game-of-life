@@ -6,10 +6,6 @@ entity eight_bit_counter is
 	port (
 		bits : in std_logic_vector(7 downto 0);
 		num : out std_logic_vector(3 downto 0)
-		
-		-- ; cnt1 : inout std_logic_vector(2 downto 0);
-		-- cnt2 : inout std_logic_vector(2 downto 0);
-		-- carry : inout std_logic_vector(3 downto 0)
 	);
 end eight_bit_counter;
 

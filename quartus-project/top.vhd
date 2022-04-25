@@ -19,9 +19,9 @@ architecture rtl of top is
 			states : 	out array_states
 		);
 	end component;
-	signal A, B :  unsigned(127 downto 0);
-	signal C :     unsigned(31 downto 0);
-	signal sum :   unsigned(159 downto 0);
+	signal reset : std_logic;
+	signal states : array_states;
+	signal start_as : array_states := (others => (others => '0')); -- Initialize most of start_as as 0 so I can pick which ones to turn on
 begin
 	TA : cell_simulation port map (clock, reset, start_as, states);
 end rtl;

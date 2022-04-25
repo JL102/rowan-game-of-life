@@ -1,22 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
---Comment Added
-
--- Adjacent cells: (possibly up for modification)
---- 7	6	5
---- 0		4
----	1	2	3
-
--- Border Cells (Edge Case 1):
---- |	4	3
----	|	X	2
----	|	0	1	 
-
--- Corner Cells (Edge Case 2):
---- _	_	_
----	|	X	2
----	|	0	1	
 
 entity cell is
 	port(
@@ -25,8 +9,6 @@ entity cell is
 		start_as : 	in std_logic; -- Starting state
 		adj : 		in std_logic_vector(7 downto 0); -- Adjacent cells' states
 		state: 		out std_logic -- Present state
-		
-		-- ; sum: inout std_logic_vector(3 downto 0) -- for debugging
 	);
 end cell;
 
@@ -45,7 +27,6 @@ begin
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			
 			-- When the reset line is on, initialize the cell based on its "start_as" control line
 			if reset = '1' then
 				state <= start_as;
@@ -58,24 +39,6 @@ begin
 			end if;
 			-- In any other condition (EXACTLY 2 adjacent live cells), 
 			-- 	dead cells stay dead and live cells stay alive (this is a no-op)
-			
-			-- if reset = '1' then
-			-- 	state <= start_as;
-			-- else
-			-- 	-- this is where all the magic will happen
-			-- 	-- Use counter to implement each state?
-				
-			-- 	-- -- any live cell with two or three neighbors survive
-			-- 	-- if(state = 1 and (sum = 2 or sum = 3)) then
-			-- 	-- 	Q <= 1;
-			-- 	-- -- Any dead cell with 3 live neighbors becomes alive
-			-- 	-- elsif(state = 0 and sum = 3) then
-			-- 	-- 	Q <= 1;
-			-- 	-- -- Otherwise set as dead
-			-- 	-- else
-			-- 	-- 	Q <= 0;
-			-- 	-- end if;
-			-- end if;
 		end if;
 	end process;
 end rtl;

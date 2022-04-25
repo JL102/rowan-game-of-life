@@ -18,7 +18,7 @@ architecture tb of sim_testbench is
 	-- signal adjacents : std_logic_vector(7 downto 0);
 	-- signal sum : std_logic_vector(3 downto 0);
 begin
-	clk <= not clk after 5 ns;
+	clk <= not clk after 1 ns;
 	
 	-- start_as(0) <= ('0', '1', '0', '0', '0', '0');
 	-- Apply stimulus and check the results
@@ -68,7 +68,7 @@ begin
 		wait for 10 ns;
 		reset <= '0';
 		
-		wait for 600 ns;
+		wait for 3000 ns;
 		
 		assert false report "Test: OK" severity failure;
 	end process;
@@ -76,6 +76,5 @@ begin
 	uut : entity work.cell_simulation
 	port map(
 		clk, reset, start_as, states
-		-- , sum --debugging
 	);
 end tb;

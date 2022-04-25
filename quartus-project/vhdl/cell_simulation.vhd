@@ -8,20 +8,13 @@ use work.package_types.all; -- see package_types.vhd
 --- 7	6	5
 --- 0		4
 ---	1	2	3
--- Alternative:
---- 0   1   2
---- 7       3
---- 6   5   4
 
 entity cell_simulation is
 	port(
 		clk : 		in std_logic;
 		reset : 	in std_logic; -- Whether to reset to the starting state
-		start_as :  in array_states
-		; states : 	inout array_states
---		start_as : 	in std_logic_vector(15 downto 0); -- Starting state
---		adj : 		in std_logic_vector(7 downto 0) -- Adjacent cells' states
---		states: 	out std_logic_vector(15 downto 0) -- Present state
+		start_as :  in array_states;
+		states : 	inout array_states
 	);
 end cell_simulation;
 
@@ -38,6 +31,7 @@ architecture rtl of cell_simulation is
 	-- signal states : array_states;
 begin
 	
+	-- Using for-generate, loop through each cell, by row and column, and generate the cell depending on its position.
 	gen_rows :
 	for row in 0 to MAX_ROW generate
 	begin
