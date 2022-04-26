@@ -3,14 +3,14 @@
 -- Author: D. M. Calhoun
 -- Description: VGA raster controller for DE10-Standard with integrated sprite
 -- 				 selector and Avalon memory-mapped IO
--- Adapted from DE2 controller written by Stephen A. Edwards
+-- Adapted from de2 controller written by Stephen A. Edwards
 -- Modified by Group 5 For Use in the Game of Life Simulation and Demonstration of RTL GoL
 -------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity de2_vga_raster is
+entity de10_vga_raster is
   
   port (
     reset : in std_logic;
@@ -35,9 +35,9 @@ entity de2_vga_raster is
     VGA_B : out std_logic_vector(7 downto 0) -- Blue[7:0]
     );
 
-end de2_vga_raster;
+end de10_vga_raster;
 
-architecture rtl of de2_vga_raster is
+architecture rtl of de10_vga_raster is
 	
 
 
