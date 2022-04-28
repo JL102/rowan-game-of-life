@@ -9,6 +9,22 @@
    categories="System" />
  <parameter name="bonusData"><![CDATA[bonusData 
 {
+   element buttons
+   {
+      datum _sortIndex
+      {
+         value = "9";
+         type = "int";
+      }
+   }
+   element buttons.s1
+   {
+      datum baseAddress
+      {
+         value = "48";
+         type = "String";
+      }
+   }
    element clk_0
    {
       datum _sortIndex
@@ -17,20 +33,20 @@
          type = "int";
       }
    }
-   element de10_vga_raster_0.avalon_slave_0
-   {
-      datum baseAddress
-      {
-         value = "0";
-         type = "String";
-      }
-   }
    element de10_vga_raster_sprites_0
    {
       datum _sortIndex
       {
          value = "8";
          type = "int";
+      }
+   }
+   element de10_vga_raster_sprites_0.avalon_slave_0
+   {
+      datum baseAddress
+      {
+         value = "0";
+         type = "String";
       }
    }
    element hex0
@@ -50,7 +66,7 @@
    {
       datum baseAddress
       {
-         value = "112";
+         value = "144";
          type = "String";
       }
    }
@@ -71,7 +87,7 @@
    {
       datum baseAddress
       {
-         value = "96";
+         value = "128";
          type = "String";
       }
    }
@@ -92,7 +108,7 @@
    {
       datum baseAddress
       {
-         value = "80";
+         value = "112";
          type = "String";
       }
    }
@@ -113,7 +129,7 @@
    {
       datum baseAddress
       {
-         value = "64";
+         value = "96";
          type = "String";
       }
    }
@@ -134,7 +150,7 @@
    {
       datum baseAddress
       {
-         value = "48";
+         value = "80";
          type = "String";
       }
    }
@@ -155,7 +171,7 @@
    {
       datum baseAddress
       {
-         value = "32";
+         value = "64";
          type = "String";
       }
    }
@@ -183,6 +199,22 @@
          type = "int";
       }
    }
+   element switch
+   {
+      datum _sortIndex
+      {
+         value = "10";
+         type = "int";
+      }
+   }
+   element switch.s1
+   {
+      datum baseAddress
+      {
+         value = "32";
+         type = "String";
+      }
+   }
 }
 ]]></parameter>
  <parameter name="clockCrossingAdapter" value="HANDSHAKE" />
@@ -204,6 +236,11 @@
  <parameter name="timeStamp" value="0" />
  <parameter name="useTestBenchNamingPattern" value="false" />
  <instanceScript></instanceScript>
+ <interface
+   name="button_external_connection"
+   internal="buttons.external_connection"
+   type="conduit"
+   dir="end" />
  <interface name="clk" internal="clk_0.clk_in" type="clock" dir="end" />
  <interface
    name="de10_vga_raster_sprites_0_vga_b"
@@ -277,6 +314,25 @@
    dir="end" />
  <interface name="hps_io" internal="hps_0.hps_io" type="conduit" dir="end" />
  <interface name="memory" internal="hps_0.memory" type="conduit" dir="end" />
+ <interface
+   name="switch_external_connection"
+   internal="switch.external_connection"
+   type="conduit"
+   dir="end" />
+ <module name="buttons" kind="altera_avalon_pio" version="18.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="Input" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="4" />
+ </module>
  <module name="clk_0" kind="clock_source" version="18.1" enabled="1">
   <parameter name="clockFrequency" value="50000000" />
   <parameter name="clockFrequencyKnown" value="true" />
@@ -902,6 +958,20 @@
   <parameter name="usb_mp_clk_div" value="0" />
   <parameter name="use_default_mpu_clk" value="true" />
  </module>
+ <module name="switch" kind="altera_avalon_pio" version="18.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="Input" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="10" />
+ </module>
  <connection
    kind="avalon"
    version="18.1"
@@ -917,7 +987,7 @@
    start="hps_0.h2f_lw_axi_master"
    end="hex0.s1">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x0070" />
+  <parameter name="baseAddress" value="0x0090" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -926,7 +996,7 @@
    start="hps_0.h2f_lw_axi_master"
    end="hex1.s1">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x0060" />
+  <parameter name="baseAddress" value="0x0080" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -935,7 +1005,7 @@
    start="hps_0.h2f_lw_axi_master"
    end="hex2.s1">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x0050" />
+  <parameter name="baseAddress" value="0x0070" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -944,7 +1014,7 @@
    start="hps_0.h2f_lw_axi_master"
    end="hex3.s1">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x0040" />
+  <parameter name="baseAddress" value="0x0060" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -953,7 +1023,7 @@
    start="hps_0.h2f_lw_axi_master"
    end="hex4.s1">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x0030" />
+  <parameter name="baseAddress" value="0x0050" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -961,6 +1031,24 @@
    version="18.1"
    start="hps_0.h2f_lw_axi_master"
    end="hex5.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0040" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="hps_0.h2f_lw_axi_master"
+   end="buttons.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0030" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="hps_0.h2f_lw_axi_master"
+   end="switch.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0020" />
   <parameter name="defaultConnection" value="false" />
@@ -971,6 +1059,8 @@
  <connection kind="clock" version="18.1" start="clk_0.clk" end="hex3.clk" />
  <connection kind="clock" version="18.1" start="clk_0.clk" end="hex4.clk" />
  <connection kind="clock" version="18.1" start="clk_0.clk" end="hex5.clk" />
+ <connection kind="clock" version="18.1" start="clk_0.clk" end="buttons.clk" />
+ <connection kind="clock" version="18.1" start="clk_0.clk" end="switch.clk" />
  <connection
    kind="clock"
    version="18.1"
@@ -992,6 +1082,16 @@
    version="18.1"
    start="clk_0.clk_reset"
    end="de10_vga_raster_sprites_0.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="clk_0.clk_reset"
+   end="buttons.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="clk_0.clk_reset"
+   end="switch.reset" />
  <connection
    kind="reset"
    version="18.1"

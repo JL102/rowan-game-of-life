@@ -1,6 +1,15 @@
 
 module hps (
+	button_external_connection_export,
 	clk_clk,
+	de10_vga_raster_sprites_0_vga_b_export,
+	de10_vga_raster_sprites_0_vga_blank_export,
+	de10_vga_raster_sprites_0_vga_clk_export,
+	de10_vga_raster_sprites_0_vga_g_export,
+	de10_vga_raster_sprites_0_vga_hs_export,
+	de10_vga_raster_sprites_0_vga_r_export,
+	de10_vga_raster_sprites_0_vga_sync_export,
+	de10_vga_raster_sprites_0_vga_vs_export,
 	hex0_external_connection_export,
 	hex1_external_connection_export,
 	hex2_external_connection_export,
@@ -58,16 +67,18 @@ module hps (
 	memory_mem_odt,
 	memory_mem_dm,
 	memory_oct_rzqin,
-	de10_vga_raster_sprites_0_vga_blank_export,
-	de10_vga_raster_sprites_0_vga_hs_export,
-	de10_vga_raster_sprites_0_vga_b_export,
-	de10_vga_raster_sprites_0_vga_g_export,
-	de10_vga_raster_sprites_0_vga_clk_export,
-	de10_vga_raster_sprites_0_vga_r_export,
-	de10_vga_raster_sprites_0_vga_vs_export,
-	de10_vga_raster_sprites_0_vga_sync_export);	
+	switch_external_connection_export);	
 
+	input	[3:0]	button_external_connection_export;
 	input		clk_clk;
+	output	[7:0]	de10_vga_raster_sprites_0_vga_b_export;
+	output		de10_vga_raster_sprites_0_vga_blank_export;
+	output		de10_vga_raster_sprites_0_vga_clk_export;
+	output	[7:0]	de10_vga_raster_sprites_0_vga_g_export;
+	output		de10_vga_raster_sprites_0_vga_hs_export;
+	output	[7:0]	de10_vga_raster_sprites_0_vga_r_export;
+	output		de10_vga_raster_sprites_0_vga_sync_export;
+	output		de10_vga_raster_sprites_0_vga_vs_export;
 	output	[3:0]	hex0_external_connection_export;
 	output	[3:0]	hex1_external_connection_export;
 	output	[3:0]	hex2_external_connection_export;
@@ -125,12 +136,5 @@ module hps (
 	output		memory_mem_odt;
 	output	[3:0]	memory_mem_dm;
 	input		memory_oct_rzqin;
-	output		de10_vga_raster_sprites_0_vga_blank_export;
-	output		de10_vga_raster_sprites_0_vga_hs_export;
-	output	[7:0]	de10_vga_raster_sprites_0_vga_b_export;
-	output	[7:0]	de10_vga_raster_sprites_0_vga_g_export;
-	output		de10_vga_raster_sprites_0_vga_clk_export;
-	output	[7:0]	de10_vga_raster_sprites_0_vga_r_export;
-	output		de10_vga_raster_sprites_0_vga_vs_export;
-	output		de10_vga_raster_sprites_0_vga_sync_export;
+	input	[9:0]	switch_external_connection_export;
 endmodule

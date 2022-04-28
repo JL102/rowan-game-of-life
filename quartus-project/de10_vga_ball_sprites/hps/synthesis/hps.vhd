@@ -8,6 +8,7 @@ use IEEE.numeric_std.all;
 
 entity hps is
 	port (
+		button_external_connection_export          : in    std_logic_vector(3 downto 0)  := (others => '0'); --          button_external_connection.export
 		clk_clk                                    : in    std_logic                     := '0';             --                                 clk.clk
 		de10_vga_raster_sprites_0_vga_b_export     : out   std_logic_vector(7 downto 0);                     --     de10_vga_raster_sprites_0_vga_b.export
 		de10_vga_raster_sprites_0_vga_blank_export : out   std_logic;                                        -- de10_vga_raster_sprites_0_vga_blank.export
@@ -73,11 +74,22 @@ entity hps is
 		memory_mem_dqs_n                           : inout std_logic_vector(3 downto 0)  := (others => '0'); --                                    .mem_dqs_n
 		memory_mem_odt                             : out   std_logic;                                        --                                    .mem_odt
 		memory_mem_dm                              : out   std_logic_vector(3 downto 0);                     --                                    .mem_dm
-		memory_oct_rzqin                           : in    std_logic                     := '0'              --                                    .oct_rzqin
+		memory_oct_rzqin                           : in    std_logic                     := '0';             --                                    .oct_rzqin
+		switch_external_connection_export          : in    std_logic_vector(9 downto 0)  := (others => '0')  --          switch_external_connection.export
 	);
 end entity hps;
 
 architecture rtl of hps is
+	component hps_buttons is
+		port (
+			clk      : in  std_logic                     := 'X';             -- clk
+			reset_n  : in  std_logic                     := 'X';             -- reset_n
+			address  : in  std_logic_vector(1 downto 0)  := (others => 'X'); -- address
+			readdata : out std_logic_vector(31 downto 0);                    -- readdata
+			in_port  : in  std_logic_vector(3 downto 0)  := (others => 'X')  -- export
+		);
+	end component hps_buttons;
+
 	component de2_vga_raster is
 		port (
 			reset      : in  std_logic                     := 'X';             -- reset
@@ -210,6 +222,16 @@ architecture rtl of hps is
 		);
 	end component hps_hps_0;
 
+	component hps_switch is
+		port (
+			clk      : in  std_logic                     := 'X';             -- clk
+			reset_n  : in  std_logic                     := 'X';             -- reset_n
+			address  : in  std_logic_vector(1 downto 0)  := (others => 'X'); -- address
+			readdata : out std_logic_vector(31 downto 0);                    -- readdata
+			in_port  : in  std_logic_vector(9 downto 0)  := (others => 'X')  -- export
+		);
+	end component hps_switch;
+
 	component hps_mm_interconnect_0 is
 		port (
 			hps_0_h2f_lw_axi_master_awid                                        : in  std_logic_vector(11 downto 0) := (others => 'X'); -- awid
@@ -251,6 +273,8 @@ architecture rtl of hps is
 			clk_0_clk_clk                                                       : in  std_logic                     := 'X';             -- clk
 			de10_vga_raster_sprites_0_reset_reset_bridge_in_reset_reset         : in  std_logic                     := 'X';             -- reset
 			hps_0_h2f_lw_axi_master_agent_clk_reset_reset_bridge_in_reset_reset : in  std_logic                     := 'X';             -- reset
+			buttons_s1_address                                                  : out std_logic_vector(1 downto 0);                     -- address
+			buttons_s1_readdata                                                 : in  std_logic_vector(31 downto 0) := (others => 'X'); -- readdata
 			de10_vga_raster_sprites_0_avalon_slave_0_address                    : out std_logic_vector(3 downto 0);                     -- address
 			de10_vga_raster_sprites_0_avalon_slave_0_write                      : out std_logic;                                        -- write
 			de10_vga_raster_sprites_0_avalon_slave_0_read                       : out std_logic;                                        -- read
@@ -286,7 +310,9 @@ architecture rtl of hps is
 			hex5_s1_write                                                       : out std_logic;                                        -- write
 			hex5_s1_readdata                                                    : in  std_logic_vector(31 downto 0) := (others => 'X'); -- readdata
 			hex5_s1_writedata                                                   : out std_logic_vector(31 downto 0);                    -- writedata
-			hex5_s1_chipselect                                                  : out std_logic                                         -- chipselect
+			hex5_s1_chipselect                                                  : out std_logic;                                        -- chipselect
+			switch_s1_address                                                   : out std_logic_vector(1 downto 0);                     -- address
+			switch_s1_readdata                                                  : in  std_logic_vector(31 downto 0) := (others => 'X')  -- readdata
 		);
 	end component hps_mm_interconnect_0;
 
@@ -429,6 +455,10 @@ architecture rtl of hps is
 	signal mm_interconnect_0_hex5_s1_address                                     : std_logic_vector(1 downto 0);  -- mm_interconnect_0:hex5_s1_address -> hex5:address
 	signal mm_interconnect_0_hex5_s1_write                                       : std_logic;                     -- mm_interconnect_0:hex5_s1_write -> mm_interconnect_0_hex5_s1_write:in
 	signal mm_interconnect_0_hex5_s1_writedata                                   : std_logic_vector(31 downto 0); -- mm_interconnect_0:hex5_s1_writedata -> hex5:writedata
+	signal mm_interconnect_0_buttons_s1_readdata                                 : std_logic_vector(31 downto 0); -- buttons:readdata -> mm_interconnect_0:buttons_s1_readdata
+	signal mm_interconnect_0_buttons_s1_address                                  : std_logic_vector(1 downto 0);  -- mm_interconnect_0:buttons_s1_address -> buttons:address
+	signal mm_interconnect_0_switch_s1_readdata                                  : std_logic_vector(31 downto 0); -- switch:readdata -> mm_interconnect_0:switch_s1_readdata
+	signal mm_interconnect_0_switch_s1_address                                   : std_logic_vector(1 downto 0);  -- mm_interconnect_0:switch_s1_address -> switch:address
 	signal rst_controller_reset_out_reset                                        : std_logic;                     -- rst_controller:reset_out -> [de10_vga_raster_sprites_0:reset, mm_interconnect_0:de10_vga_raster_sprites_0_reset_reset_bridge_in_reset_reset, rst_controller_reset_out_reset:in]
 	signal rst_controller_001_reset_out_reset                                    : std_logic;                     -- rst_controller_001:reset_out -> mm_interconnect_0:hps_0_h2f_lw_axi_master_agent_clk_reset_reset_bridge_in_reset_reset
 	signal hps_0_h2f_reset_reset_ports_inv                                       : std_logic;                     -- hps_0_h2f_reset_reset:inv -> [rst_controller:reset_in0, rst_controller_001:reset_in0]
@@ -438,9 +468,18 @@ architecture rtl of hps is
 	signal mm_interconnect_0_hex3_s1_write_ports_inv                             : std_logic;                     -- mm_interconnect_0_hex3_s1_write:inv -> hex3:write_n
 	signal mm_interconnect_0_hex4_s1_write_ports_inv                             : std_logic;                     -- mm_interconnect_0_hex4_s1_write:inv -> hex4:write_n
 	signal mm_interconnect_0_hex5_s1_write_ports_inv                             : std_logic;                     -- mm_interconnect_0_hex5_s1_write:inv -> hex5:write_n
-	signal rst_controller_reset_out_reset_ports_inv                              : std_logic;                     -- rst_controller_reset_out_reset:inv -> [hex0:reset_n, hex1:reset_n, hex2:reset_n, hex3:reset_n, hex4:reset_n, hex5:reset_n]
+	signal rst_controller_reset_out_reset_ports_inv                              : std_logic;                     -- rst_controller_reset_out_reset:inv -> [buttons:reset_n, hex0:reset_n, hex1:reset_n, hex2:reset_n, hex3:reset_n, hex4:reset_n, hex5:reset_n, switch:reset_n]
 
 begin
+
+	buttons : component hps_buttons
+		port map (
+			clk      => clk_clk,                                  --                 clk.clk
+			reset_n  => rst_controller_reset_out_reset_ports_inv, --               reset.reset_n
+			address  => mm_interconnect_0_buttons_s1_address,     --                  s1.address
+			readdata => mm_interconnect_0_buttons_s1_readdata,    --                    .readdata
+			in_port  => button_external_connection_export         -- external_connection.export
+		);
 
 	de10_vga_raster_sprites_0 : component de2_vga_raster
 		port map (
@@ -631,6 +670,15 @@ begin
 			h2f_lw_RREADY            => hps_0_h2f_lw_axi_master_rready   --                  .rready
 		);
 
+	switch : component hps_switch
+		port map (
+			clk      => clk_clk,                                  --                 clk.clk
+			reset_n  => rst_controller_reset_out_reset_ports_inv, --               reset.reset_n
+			address  => mm_interconnect_0_switch_s1_address,      --                  s1.address
+			readdata => mm_interconnect_0_switch_s1_readdata,     --                    .readdata
+			in_port  => switch_external_connection_export         -- external_connection.export
+		);
+
 	mm_interconnect_0 : component hps_mm_interconnect_0
 		port map (
 			hps_0_h2f_lw_axi_master_awid                                        => hps_0_h2f_lw_axi_master_awid,                                          --                                       hps_0_h2f_lw_axi_master.awid
@@ -672,6 +720,8 @@ begin
 			clk_0_clk_clk                                                       => clk_clk,                                                               --                                                     clk_0_clk.clk
 			de10_vga_raster_sprites_0_reset_reset_bridge_in_reset_reset         => rst_controller_reset_out_reset,                                        --         de10_vga_raster_sprites_0_reset_reset_bridge_in_reset.reset
 			hps_0_h2f_lw_axi_master_agent_clk_reset_reset_bridge_in_reset_reset => rst_controller_001_reset_out_reset,                                    -- hps_0_h2f_lw_axi_master_agent_clk_reset_reset_bridge_in_reset.reset
+			buttons_s1_address                                                  => mm_interconnect_0_buttons_s1_address,                                  --                                                    buttons_s1.address
+			buttons_s1_readdata                                                 => mm_interconnect_0_buttons_s1_readdata,                                 --                                                              .readdata
 			de10_vga_raster_sprites_0_avalon_slave_0_address                    => mm_interconnect_0_de10_vga_raster_sprites_0_avalon_slave_0_address,    --                      de10_vga_raster_sprites_0_avalon_slave_0.address
 			de10_vga_raster_sprites_0_avalon_slave_0_write                      => mm_interconnect_0_de10_vga_raster_sprites_0_avalon_slave_0_write,      --                                                              .write
 			de10_vga_raster_sprites_0_avalon_slave_0_read                       => mm_interconnect_0_de10_vga_raster_sprites_0_avalon_slave_0_read,       --                                                              .read
@@ -707,7 +757,9 @@ begin
 			hex5_s1_write                                                       => mm_interconnect_0_hex5_s1_write,                                       --                                                              .write
 			hex5_s1_readdata                                                    => mm_interconnect_0_hex5_s1_readdata,                                    --                                                              .readdata
 			hex5_s1_writedata                                                   => mm_interconnect_0_hex5_s1_writedata,                                   --                                                              .writedata
-			hex5_s1_chipselect                                                  => mm_interconnect_0_hex5_s1_chipselect                                   --                                                              .chipselect
+			hex5_s1_chipselect                                                  => mm_interconnect_0_hex5_s1_chipselect,                                  --                                                              .chipselect
+			switch_s1_address                                                   => mm_interconnect_0_switch_s1_address,                                   --                                                     switch_s1.address
+			switch_s1_readdata                                                  => mm_interconnect_0_switch_s1_readdata                                   --                                                              .readdata
 		);
 
 	rst_controller : component altera_reset_controller

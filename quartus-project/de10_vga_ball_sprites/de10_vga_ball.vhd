@@ -199,7 +199,9 @@ architecture rtl of de10_vga_ball is
             de10_vga_raster_sprites_0_vga_clk_export   : out   std_logic;                                        -- export
             de10_vga_raster_sprites_0_vga_r_export     : out   std_logic_vector(7 downto 0);                     -- export
             de10_vga_raster_sprites_0_vga_vs_export    : out   std_logic;                                        -- export
-            de10_vga_raster_sprites_0_vga_sync_export  : out   std_logic 
+            de10_vga_raster_sprites_0_vga_sync_export  : out   std_logic;
+				button_external_connection_export			: in std_logic_vector(3 downto 0);
+				switch_external_connection_export			: in std_logic_vector(9 downto 0)
 
 		);
 	end component hps;
@@ -291,12 +293,14 @@ begin
 		de10_vga_raster_sprites_0_vga_clk_export   => VGA_CLK,   --   de10_vga_raster_0_vga_clk.export
 		de10_vga_raster_sprites_0_vga_r_export     => VGA_R,     --     de10_vga_raster_0_vga_r.export
 		de10_vga_raster_sprites_0_vga_vs_export    => VGA_VS,    --    de10_vga_raster_0_vga_vs.export
-		de10_vga_raster_sprites_0_vga_sync_export  => vga_sync   --  de10_vga_raster_0_vga_sync.export
+		de10_vga_raster_sprites_0_vga_sync_export  => vga_sync,   --  de10_vga_raster_0_vga_sync.export
+		button_external_connection_export			=> KEY(3 downto 0),
+		switch_external_connection_export			=> SW(9 downto 0)
 
 	);
 	
-	VGA_BLANK_N <= vga_blank;--not(vga_blank);
-	VGA_SYNC_N <= vga_sync;--not(vga_sync);
+	VGA_BLANK_N <= vga_blank;
+	VGA_SYNC_N <= vga_sync;
 
 	--Endianness of 7-segment module is swapped!
 	

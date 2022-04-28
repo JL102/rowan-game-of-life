@@ -1,6 +1,15 @@
 	component hps is
 		port (
+			button_external_connection_export          : in    std_logic_vector(3 downto 0)  := (others => 'X'); -- export
 			clk_clk                                    : in    std_logic                     := 'X';             -- clk
+			de10_vga_raster_sprites_0_vga_b_export     : out   std_logic_vector(7 downto 0);                     -- export
+			de10_vga_raster_sprites_0_vga_blank_export : out   std_logic;                                        -- export
+			de10_vga_raster_sprites_0_vga_clk_export   : out   std_logic;                                        -- export
+			de10_vga_raster_sprites_0_vga_g_export     : out   std_logic_vector(7 downto 0);                     -- export
+			de10_vga_raster_sprites_0_vga_hs_export    : out   std_logic;                                        -- export
+			de10_vga_raster_sprites_0_vga_r_export     : out   std_logic_vector(7 downto 0);                     -- export
+			de10_vga_raster_sprites_0_vga_sync_export  : out   std_logic;                                        -- export
+			de10_vga_raster_sprites_0_vga_vs_export    : out   std_logic;                                        -- export
 			hex0_external_connection_export            : out   std_logic_vector(3 downto 0);                     -- export
 			hex1_external_connection_export            : out   std_logic_vector(3 downto 0);                     -- export
 			hex2_external_connection_export            : out   std_logic_vector(3 downto 0);                     -- export
@@ -58,20 +67,22 @@
 			memory_mem_odt                             : out   std_logic;                                        -- mem_odt
 			memory_mem_dm                              : out   std_logic_vector(3 downto 0);                     -- mem_dm
 			memory_oct_rzqin                           : in    std_logic                     := 'X';             -- oct_rzqin
-			de10_vga_raster_sprites_0_vga_blank_export : out   std_logic;                                        -- export
-			de10_vga_raster_sprites_0_vga_hs_export    : out   std_logic;                                        -- export
-			de10_vga_raster_sprites_0_vga_b_export     : out   std_logic_vector(7 downto 0);                     -- export
-			de10_vga_raster_sprites_0_vga_g_export     : out   std_logic_vector(7 downto 0);                     -- export
-			de10_vga_raster_sprites_0_vga_clk_export   : out   std_logic;                                        -- export
-			de10_vga_raster_sprites_0_vga_r_export     : out   std_logic_vector(7 downto 0);                     -- export
-			de10_vga_raster_sprites_0_vga_vs_export    : out   std_logic;                                        -- export
-			de10_vga_raster_sprites_0_vga_sync_export  : out   std_logic                                         -- export
+			switch_external_connection_export          : in    std_logic_vector(9 downto 0)  := (others => 'X')  -- export
 		);
 	end component hps;
 
 	u0 : component hps
 		port map (
+			button_external_connection_export          => CONNECTED_TO_button_external_connection_export,          --          button_external_connection.export
 			clk_clk                                    => CONNECTED_TO_clk_clk,                                    --                                 clk.clk
+			de10_vga_raster_sprites_0_vga_b_export     => CONNECTED_TO_de10_vga_raster_sprites_0_vga_b_export,     --     de10_vga_raster_sprites_0_vga_b.export
+			de10_vga_raster_sprites_0_vga_blank_export => CONNECTED_TO_de10_vga_raster_sprites_0_vga_blank_export, -- de10_vga_raster_sprites_0_vga_blank.export
+			de10_vga_raster_sprites_0_vga_clk_export   => CONNECTED_TO_de10_vga_raster_sprites_0_vga_clk_export,   --   de10_vga_raster_sprites_0_vga_clk.export
+			de10_vga_raster_sprites_0_vga_g_export     => CONNECTED_TO_de10_vga_raster_sprites_0_vga_g_export,     --     de10_vga_raster_sprites_0_vga_g.export
+			de10_vga_raster_sprites_0_vga_hs_export    => CONNECTED_TO_de10_vga_raster_sprites_0_vga_hs_export,    --    de10_vga_raster_sprites_0_vga_hs.export
+			de10_vga_raster_sprites_0_vga_r_export     => CONNECTED_TO_de10_vga_raster_sprites_0_vga_r_export,     --     de10_vga_raster_sprites_0_vga_r.export
+			de10_vga_raster_sprites_0_vga_sync_export  => CONNECTED_TO_de10_vga_raster_sprites_0_vga_sync_export,  --  de10_vga_raster_sprites_0_vga_sync.export
+			de10_vga_raster_sprites_0_vga_vs_export    => CONNECTED_TO_de10_vga_raster_sprites_0_vga_vs_export,    --    de10_vga_raster_sprites_0_vga_vs.export
 			hex0_external_connection_export            => CONNECTED_TO_hex0_external_connection_export,            --            hex0_external_connection.export
 			hex1_external_connection_export            => CONNECTED_TO_hex1_external_connection_export,            --            hex1_external_connection.export
 			hex2_external_connection_export            => CONNECTED_TO_hex2_external_connection_export,            --            hex2_external_connection.export
@@ -129,13 +140,6 @@
 			memory_mem_odt                             => CONNECTED_TO_memory_mem_odt,                             --                                    .mem_odt
 			memory_mem_dm                              => CONNECTED_TO_memory_mem_dm,                              --                                    .mem_dm
 			memory_oct_rzqin                           => CONNECTED_TO_memory_oct_rzqin,                           --                                    .oct_rzqin
-			de10_vga_raster_sprites_0_vga_blank_export => CONNECTED_TO_de10_vga_raster_sprites_0_vga_blank_export, -- de10_vga_raster_sprites_0_vga_blank.export
-			de10_vga_raster_sprites_0_vga_hs_export    => CONNECTED_TO_de10_vga_raster_sprites_0_vga_hs_export,    --    de10_vga_raster_sprites_0_vga_hs.export
-			de10_vga_raster_sprites_0_vga_b_export     => CONNECTED_TO_de10_vga_raster_sprites_0_vga_b_export,     --     de10_vga_raster_sprites_0_vga_b.export
-			de10_vga_raster_sprites_0_vga_g_export     => CONNECTED_TO_de10_vga_raster_sprites_0_vga_g_export,     --     de10_vga_raster_sprites_0_vga_g.export
-			de10_vga_raster_sprites_0_vga_clk_export   => CONNECTED_TO_de10_vga_raster_sprites_0_vga_clk_export,   --   de10_vga_raster_sprites_0_vga_clk.export
-			de10_vga_raster_sprites_0_vga_r_export     => CONNECTED_TO_de10_vga_raster_sprites_0_vga_r_export,     --     de10_vga_raster_sprites_0_vga_r.export
-			de10_vga_raster_sprites_0_vga_vs_export    => CONNECTED_TO_de10_vga_raster_sprites_0_vga_vs_export,    --    de10_vga_raster_sprites_0_vga_vs.export
-			de10_vga_raster_sprites_0_vga_sync_export  => CONNECTED_TO_de10_vga_raster_sprites_0_vga_sync_export   --  de10_vga_raster_sprites_0_vga_sync.export
+			switch_external_connection_export          => CONNECTED_TO_switch_external_connection_export           --          switch_external_connection.export
 		);
 

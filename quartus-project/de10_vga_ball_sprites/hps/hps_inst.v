@@ -1,5 +1,14 @@
 	hps u0 (
+		.button_external_connection_export          (<connected-to-button_external_connection_export>),          //          button_external_connection.export
 		.clk_clk                                    (<connected-to-clk_clk>),                                    //                                 clk.clk
+		.de10_vga_raster_sprites_0_vga_b_export     (<connected-to-de10_vga_raster_sprites_0_vga_b_export>),     //     de10_vga_raster_sprites_0_vga_b.export
+		.de10_vga_raster_sprites_0_vga_blank_export (<connected-to-de10_vga_raster_sprites_0_vga_blank_export>), // de10_vga_raster_sprites_0_vga_blank.export
+		.de10_vga_raster_sprites_0_vga_clk_export   (<connected-to-de10_vga_raster_sprites_0_vga_clk_export>),   //   de10_vga_raster_sprites_0_vga_clk.export
+		.de10_vga_raster_sprites_0_vga_g_export     (<connected-to-de10_vga_raster_sprites_0_vga_g_export>),     //     de10_vga_raster_sprites_0_vga_g.export
+		.de10_vga_raster_sprites_0_vga_hs_export    (<connected-to-de10_vga_raster_sprites_0_vga_hs_export>),    //    de10_vga_raster_sprites_0_vga_hs.export
+		.de10_vga_raster_sprites_0_vga_r_export     (<connected-to-de10_vga_raster_sprites_0_vga_r_export>),     //     de10_vga_raster_sprites_0_vga_r.export
+		.de10_vga_raster_sprites_0_vga_sync_export  (<connected-to-de10_vga_raster_sprites_0_vga_sync_export>),  //  de10_vga_raster_sprites_0_vga_sync.export
+		.de10_vga_raster_sprites_0_vga_vs_export    (<connected-to-de10_vga_raster_sprites_0_vga_vs_export>),    //    de10_vga_raster_sprites_0_vga_vs.export
 		.hex0_external_connection_export            (<connected-to-hex0_external_connection_export>),            //            hex0_external_connection.export
 		.hex1_external_connection_export            (<connected-to-hex1_external_connection_export>),            //            hex1_external_connection.export
 		.hex2_external_connection_export            (<connected-to-hex2_external_connection_export>),            //            hex2_external_connection.export
@@ -57,13 +66,6 @@
 		.memory_mem_odt                             (<connected-to-memory_mem_odt>),                             //                                    .mem_odt
 		.memory_mem_dm                              (<connected-to-memory_mem_dm>),                              //                                    .mem_dm
 		.memory_oct_rzqin                           (<connected-to-memory_oct_rzqin>),                           //                                    .oct_rzqin
-		.de10_vga_raster_sprites_0_vga_blank_export (<connected-to-de10_vga_raster_sprites_0_vga_blank_export>), // de10_vga_raster_sprites_0_vga_blank.export
-		.de10_vga_raster_sprites_0_vga_hs_export    (<connected-to-de10_vga_raster_sprites_0_vga_hs_export>),    //    de10_vga_raster_sprites_0_vga_hs.export
-		.de10_vga_raster_sprites_0_vga_b_export     (<connected-to-de10_vga_raster_sprites_0_vga_b_export>),     //     de10_vga_raster_sprites_0_vga_b.export
-		.de10_vga_raster_sprites_0_vga_g_export     (<connected-to-de10_vga_raster_sprites_0_vga_g_export>),     //     de10_vga_raster_sprites_0_vga_g.export
-		.de10_vga_raster_sprites_0_vga_clk_export   (<connected-to-de10_vga_raster_sprites_0_vga_clk_export>),   //   de10_vga_raster_sprites_0_vga_clk.export
-		.de10_vga_raster_sprites_0_vga_r_export     (<connected-to-de10_vga_raster_sprites_0_vga_r_export>),     //     de10_vga_raster_sprites_0_vga_r.export
-		.de10_vga_raster_sprites_0_vga_vs_export    (<connected-to-de10_vga_raster_sprites_0_vga_vs_export>),    //    de10_vga_raster_sprites_0_vga_vs.export
-		.de10_vga_raster_sprites_0_vga_sync_export  (<connected-to-de10_vga_raster_sprites_0_vga_sync_export>)   //  de10_vga_raster_sprites_0_vga_sync.export
+		.switch_external_connection_export          (<connected-to-switch_external_connection_export>)           //          switch_external_connection.export
 	);
 
