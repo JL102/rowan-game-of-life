@@ -9,6 +9,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.package_types.all;
+
 
 entity de2_vga_raster is
   
@@ -39,6 +41,23 @@ end de2_vga_raster;
 
 architecture rtl of de2_vga_raster is
 	
+	-- Cell simulation
+	signal states : array_states;
+	signal start_as : array_states := (others => (others => '0')); -- Initialize most of start_as as 0 so I can pick which ones to turn on
+	signal enable	: std_logic	:=	'1';
+	signal clk_div_ctrl : unsigned(2 downto 0);
+	signal sim_reset : std_logic := '1'; -- hacky but needed
+	
+	component cell_simulation is port(
+		clk 			:	in std_logic;
+		reset 			: 	in std_logic;
+		start_as_arr	:	in array_states;
+		enable			:	in std_logic;
+		clk_div_ctrl	:	in unsigned(2 downto 0);
+	    states 			: 	inout array_states
+	);
+	end component;
+	
 	-- Video parameters
 
 	constant HTOTAL       : integer := 800;
@@ -57,20 +76,70 @@ architecture rtl of de2_vga_raster is
 	-- Signals for the video controller
 	signal Hcount : unsigned(9 downto 0);-- := 200;  -- Horizontal position (0-800)
 	signal Vcount : unsigned(9 downto 0);-- := 200;  -- Vertical position (0-524)
+	signal CellX, CellY : unsigned(9 downto 0);
+	
 	signal EndOfLine, EndOfField : std_logic;
 
 	signal vga_hblank, vga_hsync, vga_vblank, vga_vsync : std_logic := '0';  -- Sync. signals
 
 	-- need to clock at about 25 MHz for NTSC VGA
 	signal clk_25 : std_logic := '0';
-	signal spr_load : std_logic := '1';
+	signal cell_alive : std_logic := '0';
 begin
+	
+	-- Set up start_as ROMstart_as(25, 2) <= '1';
+	start_as(23, 3) <= '1';
+	start_as(25, 3) <= '1';
+	start_as(13, 4) <= '1';
+	start_as(14, 4) <= '1';
+	start_as(21, 4) <= '1';
+	start_as(22, 4) <= '1';
+	start_as(35, 4) <= '1';
+	start_as(36, 4) <= '1';
+	start_as(12, 5) <= '1';
+	start_as(16, 5) <= '1';
+	start_as(21, 5) <= '1';
+	start_as(22, 5) <= '1';
+	start_as(35, 5) <= '1';
+	start_as(36, 5) <= '1';
+	start_as(1, 6) <= '1';
+	start_as(2, 6) <= '1';
+	start_as(11, 6) <= '1';
+	start_as(17, 6) <= '1';
+	start_as(21, 6) <= '1';
+	start_as(22, 6) <= '1';
+	start_as(1, 7) <= '1';
+	start_as(2, 7) <= '1';
+	start_as(11, 7) <= '1';
+	start_as(15, 7) <= '1';
+	start_as(17, 7) <= '1';
+	start_as(18, 7) <= '1';
+	start_as(23, 7) <= '1';
+	start_as(25, 7) <= '1';
+	start_as(11, 8) <= '1';
+	start_as(17, 8) <= '1';
+	start_as(25, 8) <= '1';
+	start_as(12, 9) <= '1';
+	start_as(16, 9) <= '1';
+	start_as(13, 10) <= '1';
+	start_as(14, 10) <= '1';
+	
+	clk_div_ctrl <= "111";
+	
+	-- Create the simulation component
+	sim : cell_simulation port map (
+		clk, sim_reset, start_as, enable, clk_div_ctrl, states
+	);
+
 
 	-- set up 25 MHz clock
 	process (clk)
 	begin
 		if rising_edge(clk) then
 			clk_25 <= not clk_25;
+			if sim_reset = '1' then
+				sim_reset <= '0';
+			end if;
 		end if;
 	end process;
 	
@@ -85,7 +154,7 @@ begin
 			  Hcount <= (others => '0');
 			else
 			  Hcount <= Hcount + 1;
-			end if;      
+			end if;
 		end if;
 	end process HCounter;
 
@@ -163,7 +232,16 @@ begin
 			end if;
 		end if;
 	end process VBlankGen;
-						
+
+	CellChecker : process (clk_25)
+	begin
+		if rising_edge(clk_25) then
+			CellX <= shift_right(Hcount + HBACK_PORCH, 4);
+			CellY <= shift_right(Vcount + VBACK_PORCH, 4);
+			cell_alive <= states(to_integer(CellX), to_integer(CellY));
+		end if;
+	end process CellChecker;
+	
 	-- Registered video signals going to the video DAC
 
 	VideoOut : process (clk_25, reset)
@@ -173,18 +251,34 @@ begin
 			VGA_G <= "00000000";
 			VGA_B <= "00000000";
 		elsif clk_25'event and clk_25 = '1' then
-			if spr_load = '1' then
+			if cell_alive = '1' then
+				VGA_R <= "11111111";
+				VGA_G <= "11111111";
+				VGA_B <= "11111111";
+			elsif cell_alive = '-' then
+				VGA_R <= "00000000";
+				VGA_G <= "11111111";
+				VGA_B <= "11111111";
+			elsif cell_alive = 'U' then
 				VGA_R <= "11111111";
 				VGA_G <= "00000000";
 				VGA_B <= "11111111";
-			elsif vga_hblank = '0' and vga_vblank = '0' then
+			elsif cell_alive = 'X' then
+				VGA_R <= "11111111";
+				VGA_G <= "11111111";
+				VGA_B <= "00000000";
+			elsif cell_alive = '0' then
 				VGA_R <= "00000000";
 				VGA_G <= "00000000";
-				VGA_B <= "11111111";
+				VGA_B <= "00000000";
+			elsif vga_hblank = '0' and vga_vblank = '0' then
+				VGA_R <= "00000000";
+				VGA_G <= "11111111";
+				VGA_B <= "00000000";
 			else
 				VGA_R <= "00000000";
 				VGA_G <= "00000000";
-				VGA_B <= "00000000";    
+				VGA_B <= "11111111";    
 			end if;
 	end if;
 	end process VideoOut;

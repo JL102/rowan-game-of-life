@@ -33,15 +33,14 @@ architecture rtl of cell is
 	
 	-- signal sum 			: std_logic_vector (3 downto 0); -- number of bits that are '1' 000
 	signal clk_out		:	std_logic;
-begin
-	
 	-- signal sum : unsigned (3 downto 0); -- number of bits that are '1' 000
 begin	
 	-- Counter : eight_bit_counter port map(adj, sum); -- Use the eight bit counter to identify the number of adjacent live cells
 	
 	clk_div : clock_div port map(clk, enable, reset, clk_div_ctrl, clk_out);
-	variable sum : unsigned(3 downto 0) := "0000";
+	
 	process(clk_out)
+		variable sum : unsigned(3 downto 0) := "0000";
 	begin
 		if rising_edge(clk_out) then
 			sum := "0000";   --initialize count variable.
