@@ -31,7 +31,7 @@ begin
     begin
         if enable = '1' then  
             if reset = '1' then
-                count <= "1";
+                count <= "000000000000000000001";	  -- 0000 0000 0000 0000 0001
             elsif rising_edge(clk) then
                 count <= count + "1";
                 -- divide by what is set by the control

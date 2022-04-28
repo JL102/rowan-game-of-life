@@ -12,6 +12,8 @@ architecture tb of cell_testbench is
 	signal state : std_logic;
 	signal adjacents : std_logic_vector(7 downto 0);
 	signal sum : std_logic_vector(3 downto 0);
+	signal enable : std_logic := '1';
+	signal clk_div_ctrl : unsigned(2 downto 0);
 begin
 	clk <= not clk after 5 ns;
 	-- Apply stimulus and check the results
@@ -50,7 +52,7 @@ begin
 	-- Instantiate the Unit Under Test
 	uut : entity work.cell
 	port map(
-		clk, reset, start_as, adjacents, state
+		clk, reset, start_as, enable, adjacents, clk_div_ctrl, state
 		-- , sum --debugging
 	);
 end tb;

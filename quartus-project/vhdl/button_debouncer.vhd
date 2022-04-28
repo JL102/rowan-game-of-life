@@ -9,7 +9,7 @@ use ieee.numeric_std.all;
 -- take a clock, wait unit next clock cycle, and push a 1
 
 -- period = 1/clk_25 = 1/25 MHz = 40 ns. 
--- Therefore need a period of 39 ns
+-- Therefore need a period of 39 ns -> x0027 in hex
 
 entity button_debouncer is
     port(

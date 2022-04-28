@@ -14,6 +14,8 @@ architecture tb of sim_testbench is
 	signal reset : std_logic;
 	signal states : array_states;
 	signal start_as : array_states := (others => (others => '0')); -- Initialize most of start_as as 0 so I can pick which ones to turn on
+	signal enable	: std_logic	:=	'1';
+	signal clk_div_ctrl : unsigned(2 downto 0);
 	-- signal state : std_logic;
 	-- signal adjacents : std_logic_vector(7 downto 0);
 	-- signal sum : std_logic_vector(3 downto 0);
@@ -64,10 +66,35 @@ begin
 		start_as(15, 10) <= '1';
 		start_as(16, 10) <= '1';
 		
-		
+		clk_div_ctrl <= "001";
 		wait for 10 ns;
 		reset <= '0';
 		
+		wait for 100 ns;
+		clk_div_ctrl <= "010";
+		wait for 100 ns;
+		clk_div_ctrl <= "011";
+		wait for 100 ns;
+		clk_div_ctrl <= "100";
+		wait for 100 ns;
+		clk_div_ctrl <= "101";
+		wait for 100 ns;
+		clk_div_ctrl <= "110";
+		wait for 100 ns;
+		clk_div_ctrl <= "111";
+		wait for 100 ns;
+
+		enable <= '0';
+		wait for 10 ns;
+		enable <= '1';
+		wait for 10 ns;
+
+		reset <= '1';
+		wait for 10 ns;
+
+		reset <= '0';
+		wait for 100 ns;
+
 		wait for 3000 ns;
 		
 		assert false report "Test: OK" severity failure;
@@ -75,6 +102,7 @@ begin
 	-- Instantiate the Unit Under Test
 	uut : entity work.cell_simulation
 	port map(
-		clk, reset, start_as, states
+		clk, reset, start_as, enable, clk_div_ctrl, states
+		-- , sum --debugging
 	);
 end tb;
