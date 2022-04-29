@@ -28,45 +28,44 @@ begin
 	begin
 		reset <= '1';
 		-- Use roms/makerom.js to get testbench code from an image
-		
-		start_as(27, 2) <= '1';
+		start_as(25, 2) <= '1';
+		start_as(23, 3) <= '1';
 		start_as(25, 3) <= '1';
-		start_as(27, 3) <= '1';
-		start_as(15, 4) <= '1';
-		start_as(16, 4) <= '1';
-		start_as(23, 4) <= '1';
-		start_as(24, 4) <= '1';
-		start_as(37, 4) <= '1';
-		start_as(38, 4) <= '1';
-		start_as(14, 5) <= '1';
-		start_as(18, 5) <= '1';
-		start_as(23, 5) <= '1';
-		start_as(24, 5) <= '1';
-		start_as(37, 5) <= '1';
-		start_as(38, 5) <= '1';
-		start_as(3, 6) <= '1';
-		start_as(4, 6) <= '1';
-		start_as(13, 6) <= '1';
-		start_as(19, 6) <= '1';
-		start_as(23, 6) <= '1';
-		start_as(24, 6) <= '1';
-		start_as(3, 7) <= '1';
-		start_as(4, 7) <= '1';
-		start_as(13, 7) <= '1';
+		start_as(13, 4) <= '1';
+		start_as(14, 4) <= '1';
+		start_as(21, 4) <= '1';
+		start_as(22, 4) <= '1';
+		start_as(35, 4) <= '1';
+		start_as(36, 4) <= '1';
+		start_as(12, 5) <= '1';
+		start_as(16, 5) <= '1';
+		start_as(21, 5) <= '1';
+		start_as(22, 5) <= '1';
+		start_as(35, 5) <= '1';
+		start_as(36, 5) <= '1';
+		start_as(1, 6) <= '1';
+		start_as(2, 6) <= '1';
+		start_as(11, 6) <= '1';
+		start_as(17, 6) <= '1';
+		start_as(21, 6) <= '1';
+		start_as(22, 6) <= '1';
+		start_as(1, 7) <= '1';
+		start_as(2, 7) <= '1';
+		start_as(11, 7) <= '1';
+		start_as(15, 7) <= '1';
 		start_as(17, 7) <= '1';
-		start_as(19, 7) <= '1';
-		start_as(20, 7) <= '1';
+		start_as(18, 7) <= '1';
+		start_as(23, 7) <= '1';
 		start_as(25, 7) <= '1';
-		start_as(27, 7) <= '1';
-		start_as(13, 8) <= '1';
-		start_as(19, 8) <= '1';
-		start_as(27, 8) <= '1';
-		start_as(14, 9) <= '1';
-		start_as(18, 9) <= '1';
-		start_as(15, 10) <= '1';
-		start_as(16, 10) <= '1';
+		start_as(11, 8) <= '1';
+		start_as(17, 8) <= '1';
+		start_as(25, 8) <= '1';
+		start_as(12, 9) <= '1';
+		start_as(16, 9) <= '1';
+		start_as(13, 10) <= '1';
+		start_as(14, 10) <= '1';
 		
-		clk_div_ctrl <= "001";
+		clk_div_ctrl <= "000";
 		wait for 10 ns;
 		reset <= '0';
 		
@@ -74,7 +73,7 @@ begin
 		clk_div_ctrl <= "010";
 		wait for 100 ns;
 		clk_div_ctrl <= "011";
-		wait for 100 ns;
+		wait for 1200 ns;
 		clk_div_ctrl <= "100";
 		wait for 100 ns;
 		clk_div_ctrl <= "101";
@@ -95,7 +94,7 @@ begin
 		reset <= '0';
 		wait for 100 ns;
 
-		wait for 3000 ns;
+		-- wait for 3000 ns;
 		
 		assert false report "Test: OK" severity failure;
 	end process;

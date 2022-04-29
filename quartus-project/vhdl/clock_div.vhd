@@ -20,6 +20,7 @@ entity clock_div is
 
         -- single bit to turn clk on or off
         clk_out :   out std_logic
+		-- ; count : inout unsigned(20 downto 0) -- for debugging
     );
 end clock_div;
 
@@ -33,7 +34,7 @@ begin
             if reset = '1' then
                 count <= "000000000000000000001";	  -- 0000 0000 0000 0000 0001
             elsif rising_edge(clk) then
-                count <= count + "1";
+                count <= count + 1;
                 -- divide by what is set by the control
                 -- with count select clk_out <= 
                 --     clk       when  "000",
@@ -45,6 +46,7 @@ begin
                 --     count(17) when  "110",
                 --     count(20) when  "111";
                 case(control) is
+					when "000" => clk_out <= count(0); -- it's divided by 2 but for some reason, I ca't assign it <= clk.
                     when "001" => clk_out <= count(2);
                     when "010" => clk_out <= count(5);
                     when "011" => clk_out <= count(8);
@@ -52,7 +54,7 @@ begin
                     when "101" => clk_out <= count(14);
                     when "110" => clk_out <= count(17);
                     when "111" => clk_out <= count(20);
-                    when others => clk_out <= clk;
+					when others => clk_out <= '-';
                 end case ;
             end if;
         end if ;

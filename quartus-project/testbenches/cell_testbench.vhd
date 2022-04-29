@@ -14,11 +14,13 @@ architecture tb of cell_testbench is
 	signal sum : std_logic_vector(3 downto 0);
 	signal enable : std_logic := '1';
 	signal clk_div_ctrl : unsigned(2 downto 0);
+	signal clk_out : std_logic;
 begin
-	clk <= not clk after 5 ns;
+	clk <= not clk after 2 ns;
 	-- Apply stimulus and check the results
 	process
 	begin
+		clk_div_ctrl <= "000";
 		adjacents <= "00000000";
 		reset <= '1';
 		start_as <= '0';
@@ -33,6 +35,7 @@ begin
 		wait for 40 ns;
 		adjacents <= "10101010"; -- death
 		wait for 40 ns;
+		clk_div_ctrl <= "001";
 		adjacents <= "00010101"; -- birth
 		wait for 40 ns;
 		adjacents <= "11000000"; -- staying alive
@@ -54,5 +57,6 @@ begin
 	port map(
 		clk, reset, start_as, enable, adjacents, clk_div_ctrl, state
 		-- , sum --debugging
+		-- , clk_out -- debugging
 	);
 end tb;
