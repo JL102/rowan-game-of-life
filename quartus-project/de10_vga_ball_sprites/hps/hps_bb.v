@@ -67,7 +67,8 @@ module hps (
 	memory_mem_odt,
 	memory_mem_dm,
 	memory_oct_rzqin,
-	switch_external_connection_export);	
+	switch_external_connection_export,
+	de10_vga_raster_sprites_0_switchbuttons_new_signal);	
 
 	input	[3:0]	button_external_connection_export;
 	input		clk_clk;
@@ -137,4 +138,5 @@ module hps (
 	output	[3:0]	memory_mem_dm;
 	input		memory_oct_rzqin;
 	input	[9:0]	switch_external_connection_export;
+	input	[15:0]	de10_vga_raster_sprites_0_switchbuttons_new_signal;
 endmodule
