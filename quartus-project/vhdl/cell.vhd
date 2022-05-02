@@ -17,10 +17,10 @@ end cell;
 
 architecture rtl of cell is
 	
-	component eight_bit_counter is
-		port (bits : in std_logic_vector(7 downto 0);
-			num : out std_logic_vector(3 downto 0));
-	end component;
+	-- component eight_bit_counter is
+	-- 	port (bits : in std_logic_vector(7 downto 0);
+	-- 		num : out std_logic_vector(3 downto 0));
+	-- end component;
 
 	component clock_div is
 		port(
@@ -32,11 +32,10 @@ architecture rtl of cell is
 		);
 	end component; 
 	
-	signal sum 			: std_logic_vector (3 downto 0); -- number of bits that are '1' 000
+	-- signal sum 			: std_logic_vector (3 downto 0); -- number of bits that are '1' 000
 	signal clk_out		:	std_logic;
-	-- signal sum : unsigned (3 downto 0); -- number of bits that are '1' 000
 begin	
-	Counter : eight_bit_counter port map(adj, sum); -- Use the eight bit counter to identify the number of adjacent live cells
+	-- Counter : eight_bit_counter port map(adj, sum); -- Use the eight bit counter to identify the number of adjacent live cells
 	
 	clk_div : clock_div port map(clk, enable, reset, clk_div_ctrl, clk_out);
 	
@@ -52,18 +51,18 @@ begin
 	-- end process;
 	
 	process(clk_out, reset)
-		-- variable sum : unsigned(3 downto 0) := "0000";
+		variable sum : unsigned(3 downto 0) := "0000";
 	begin
 		-- When the reset line is on, initialize the cell based on its "start_as" control line
 		if reset = '1' then
 			state <= start_as;
 		elsif rising_edge(clk_out) then
-			-- sum := "0000";   --initialize count variable.
-			-- for i in 0 to 7 loop   --check for all the bits.
-			-- 	if(adj(i) = '1') then --check if the bit is '1'
-			-- 		sum := sum + 1; --if its one, increment the count.
-			-- 	end if;
-			-- end loop;
+			sum := "0000";   --initialize count variable.
+			for i in 0 to 7 loop   --check for all the bits.
+				if(adj(i) = '1') then --check if the bit is '1'
+					sum := sum + 1; --if its one, increment the count.
+				end if;
+			end loop;
 			
 			-- When there are THREE adjacent live cells, become ALIVE no matter the present state
 			if sum = "0011" then

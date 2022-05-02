@@ -11,8 +11,8 @@ use work.package_types.all; -- see package_types.vhd
 
 entity cell_simulation is
 	port(
-		clk 			:	in std_logic;
-		reset 			: 	in std_logic; -- Whether to reset to the starting state
+		clk 				:	in std_logic;
+		reset 			: 	in std_logic;
 		start_as_arr	:	in array_states;
 		enable			:	in std_logic;
 		clk_div_ctrl	:	in unsigned(2 downto 0);

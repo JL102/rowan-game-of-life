@@ -14,15 +14,18 @@ end top;
 architecture rtl of top is
 	component cell_simulation is 
 		port(
-			clk : 		in std_logic;
-			reset : 	in std_logic; -- Whether to reset to the starting state
-			start_as :  in array_states;
-			states : 	out array_states
+			clk 				:	in std_logic;
+			reset 			: 	in std_logic;
+			start_as_arr	:	in array_states;
+			enable			:	in std_logic;
+			clk_div_ctrl	:	in unsigned(2 downto 0);
+			 states 			: 	inout array_states
 		);
 	end component;
-	signal reset : std_logic;
+	signal reset, enable : std_logic;
 	signal states : array_states;
 	signal start_as : array_states := (others => (others => '0')); -- Initialize most of start_as as 0 so I can pick which ones to turn on
+	signal clk_div_ctrl : unsigned(2 downto 0) := "000";
 begin
 
 		
@@ -63,6 +66,6 @@ begin
 		start_as(15, 10) <= '1';
 		start_as(16, 10) <= '1';
 
-	TA : cell_simulation port map (clock, reset, start_as, states);
+	TA : cell_simulation port map (clock, reset, start_as, enable, clk_div_ctrl, states);
 	LEDR(0) <= states(27,2);
 end rtl;
