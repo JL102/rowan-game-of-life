@@ -11,9 +11,8 @@ use STD.TEXTIO.all;
 -- C:\intelFPGA_lite\18.1\quartus\libraries\vhdl\ieee\2008
 package package_types is
 	
-	constant MAX_ROW : integer := 40;
-	constant MAX_COL : integer := 30;
-	constant DIV_AMT : integer := 5; -- this is for zooming in to the cell simulation
+	constant MAX_ROW : integer := 64;
+	constant MAX_COL : integer := 32;
 	
 	type array_states is array (MAX_ROW downto 0, MAX_COL downto 0) of std_logic;
 

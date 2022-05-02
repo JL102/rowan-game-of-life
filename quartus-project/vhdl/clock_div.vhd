@@ -20,19 +20,19 @@ entity clock_div is
 
         -- single bit to turn clk on or off
         clk_out :   out std_logic
-		-- ; count : inout unsigned(20 downto 0) -- for debugging
+		; count : inout unsigned(20 downto 0) -- for debugging
     );
 end clock_div;
 
 architecture rtl of clock_div is
     -- counter
-    signal count    :   unsigned(20 downto 0);
+    -- signal count    :   unsigned(20 downto 0);
 begin
-    process(clk)
+    process(clk, control)
     begin
         if enable = '1' then  
             if reset = '1' then
-                count <= "000000000000000000001";	  -- 0000 0000 0000 0000 0001
+                count <= "000000000000000000000";	  -- 0000 0000 0000 0000 0001
             elsif rising_edge(clk) then
                 count <= count + 1;
                 -- divide by what is set by the control
@@ -45,18 +45,22 @@ begin
                 --     count(14) when  "101",
                 --     count(17) when  "110",
                 --     count(20) when  "111";
-                case(control) is
-					when "000" => clk_out <= count(0); -- it's divided by 2 but for some reason, I ca't assign it <= clk.
-                    when "001" => clk_out <= count(2);
-                    when "010" => clk_out <= count(5);
-                    when "011" => clk_out <= count(8);
-                    when "100" => clk_out <= count(11);
-                    when "101" => clk_out <= count(14);
-                    when "110" => clk_out <= count(17);
-                    when "111" => clk_out <= count(20);
-					when others => clk_out <= '-';
-                end case ;
             end if;
-        end if ;
+        end if;
     end process;
+	
+	process(clk)
+	begin
+		case(control) is
+			when "000" => clk_out <= clk; -- it's divided by 2 but for some reason, I ca't assign it <= clk.
+			when "001" => clk_out <= count(2);
+			when "010" => clk_out <= count(5);
+			when "011" => clk_out <= count(8);
+			when "100" => clk_out <= count(11);
+			when "101" => clk_out <= count(14);
+			when "110" => clk_out <= count(17);
+			when "111" => clk_out <= count(20);
+			when others => clk_out <= '-';
+		end case ;
+	end process;
 end rtl ; -- rtl

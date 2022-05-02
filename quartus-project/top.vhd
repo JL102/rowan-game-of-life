@@ -1,7 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use ieee.package_types.all;
+use work.package_types.all;
 
 -- Quartus  fitter was whining at me, so I'm making a TLE which contains the TimingAnalyzer
 entity top is 
