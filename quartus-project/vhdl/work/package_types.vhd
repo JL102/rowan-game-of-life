@@ -12,7 +12,7 @@ use STD.TEXTIO.all;
 package package_types is
 	
 	constant MAX_ROW : integer := 40;
-	constant MAX_COL : integer := 13;
+	constant MAX_COL : integer := 30;
 	constant DIV_AMT : integer := 3; -- this is for zooming in to the cell simulation
 	
 	type array_states is array (MAX_ROW downto 0, MAX_COL downto 0) of std_logic;

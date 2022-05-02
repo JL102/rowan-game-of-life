@@ -13,8 +13,8 @@ use work.package_types.all;
 entity de2_vga_raster is
   
   port (
-    reset : in std_logic;
-    clk   : in std_logic;                    -- Should be 50.0MHz
+	reset : in std_logic;
+	clk   : in std_logic;                    -- Should be 50.0MHz
 	---------Read from memory to access position *Not utilized------------------
 	read			:	in std_logic;
 	write		: 	in std_logic;
@@ -24,16 +24,16 @@ entity de2_vga_raster is
 	writedata	:	in std_logic_vector(15 downto 0);
 -------------------------------------------------------------------------------
 	-- VGA connectivity
-    VGA_CLK,                         -- Clock
-    VGA_HS,                          -- H_SYNC
-    VGA_VS,                          -- V_SYNC
-    VGA_BLANK,                       -- BLANK
-    VGA_SYNC : out std_logic := '0';        -- SYNC
-    VGA_R,                           -- Red[7:0]
-    VGA_G,                           -- Green[7:0]
-    VGA_B : out std_logic_vector(7 downto 0); -- Blue[7:0]
-	 SwitchButtons_signal : in  std_logic_vector(15 downto 0) -- Switches and Buttons (Switches Bits 15-6, Buttons 5-2, Blank 1/0)
-    );
+	VGA_CLK,                         -- Clock
+	VGA_HS,                          -- H_SYNC
+	VGA_VS,                          -- V_SYNC
+	VGA_BLANK,                       -- BLANK
+	VGA_SYNC : out std_logic := '0';        -- SYNC
+	VGA_R,                           -- Red[7:0]
+	VGA_G,                           -- Green[7:0]
+	VGA_B : out std_logic_vector(7 downto 0); -- Blue[7:0]
+	SwitchButtons_signal : in  std_logic_vector(15 downto 0) -- Switches and Buttons (Switches Bits 15-6, Buttons 5-2, Blank 1/0)
+	);
 
 end de2_vga_raster;
 
@@ -53,7 +53,7 @@ architecture rtl of de2_vga_raster is
 		start_as_arr	:	in array_states;
 		enable			:	in std_logic;
 		clk_div_ctrl	:	in unsigned(2 downto 0);
-	    states 			: 	inout array_states
+		states 			: 	inout array_states
 	);
 	end component;
 -------------------------------------------------------------------------------
@@ -81,10 +81,12 @@ architecture rtl of de2_vga_raster is
 	--------------------Signals for 25MHZ Clock and Cell State---------------------
 	signal clk_25 : std_logic := '0';
 	signal cell_alive : std_logic := '0';
+	signal sim_clk : std_logic;
 	
 	-------------------------------------------------------------------------------
 begin
-	-- Set up start_as ROMstart_as(25, 2) <= '1'; ("Glider Gun")
+	-- Set up start_as ROM ("Glider Gun")
+	start_as(25, 2) <= '1';
 	start_as(23, 3) <= '1';
 	start_as(25, 3) <= '1';
 	start_as(13, 4) <= '1';
@@ -119,19 +121,28 @@ begin
 	start_as(12, 9) <= '1';
 	start_as(16, 9) <= '1';
 	start_as(13, 10) <= '1';
-	start_as(14, 10) <= '1';
+	start_as(14, 10) <= '1';	
 	-------------------Clock Speed configured based on Switch Positions---------------------------
 	clk_div_ctrl <= SwitchButtons_signal(15) & SwitchButtons_signal(14) & SwitchButtons_signal(13);
 	------------------- Simulation Reset Pushbutton ----------------------------------------------
-		sim_reset <= SwitchButtons_signal(3);
+	sim_reset <= not SwitchButtons_signal(3);
 	------------------- Simulation Enable Trigger ------------------------------------------------
 	--(Start/Stop)
-	--enable <= not SwitchButtons_signal(4); (Configured currently as "pause") 
+	enable <= SwitchButtons_signal(6); -- (Configured currently as "pause") 
 	----------------------------------------------------------------------------------------------
-		
+	
+	process (SwitchButtons_signal, clk)
+	begin
+		if SwitchButtons_signal(7) = '1' then
+			sim_clk <= clk; -- Auto mode
+		else 
+			sim_clk <= not SwitchButtons_signal(7); -- Manual mode
+		end if;
+	end process;
+	
 	-- Create the simulation component
 	sim : cell_simulation port map (
-		clk, sim_reset, start_as, enable, clk_div_ctrl, states
+		sim_clk, sim_reset, start_as, enable, clk_div_ctrl, states
 	);
 
 
@@ -239,8 +250,8 @@ begin
 	CellChecker : process (clk_25)
 	begin
 		if rising_edge(clk_25) then
-			CellX <= shift_right(Hcount + HBACK_PORCH, 4);
-			CellY <= shift_right(Vcount + VBACK_PORCH, 4);
+			CellX <= shift_right(Hcount + HBACK_PORCH, 5);
+			CellY <= shift_right(Vcount + VBACK_PORCH, 5);
 			cell_alive <= states(to_integer(CellX), to_integer(CellY));
 		end if;
 	end process CellChecker;
