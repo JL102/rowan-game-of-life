@@ -131,7 +131,7 @@ end entity;
 
 
 architecture rtl of de10_vga_ball is
-
+---------------------------------------Component HPS Definition / Instantiation ---------------------
 	component hps is
 		port (
             clk_clk                         : in    std_logic                     := 'X';             -- clk
@@ -201,31 +201,33 @@ architecture rtl of de10_vga_ball is
             de10_vga_raster_sprites_0_vga_vs_export    : out   std_logic;                                        -- export
             de10_vga_raster_sprites_0_vga_sync_export  : out   std_logic;
 				button_external_connection_export			: in std_logic_vector(3 downto 0);
-				switch_external_connection_export			: in std_logic_vector(9 downto 0)
-
+				switch_external_connection_export			: in std_logic_vector(9 downto 0);
+				de10_vga_raster_sprites_0_switchbuttons_new_signal : in    std_logic_vector(15 downto 0) := (others => 'X')  -- Transfer Switch and Button to VGA Raster
 		);
 	end component hps;
-	
+-----------------------------------------------------------------------------------------------------------------
+----------------------------------------Seven Segment Displays---------------------------------------------------
 	component sevenseg is
 		port(
 				BININ 		:		in			std_logic_vector(3 downto 0);
 				HEX			:		out		std_logic_vector(6 downto 0)
 			);
 	end component sevenseg;
-
+-----------------------------------------------------------------------------------------------------------------
 	signal hex0_hps_bin : std_logic_vector(3 downto 0) := (others => '0');
 	signal hex1_hps_bin : std_logic_vector(3 downto 0) := (others => '0');
 	signal hex2_hps_bin : std_logic_vector(3 downto 0) := (others => '0');
 	signal hex3_hps_bin : std_logic_vector(3 downto 0) := (others => '0');
 	signal hex4_hps_bin : std_logic_vector(3 downto 0) := (others => '0');
 	signal hex5_hps_bin : std_logic_vector(3 downto 0) := (others => '0');
-	
+-----------------------------------------------------------------------------------------------------------------
+	signal SwiBut : std_logic_vector (15 downto 0) := (others => '0'); -- Signal to store button and switches
+-----------------------------------------------------------------------------------------------------------------
 	signal vga_sync : std_logic;
 	signal vga_blank : std_logic;
-
+-----------------------------------------------------------------------------------------------------------------
 begin
-
-
+-------------------------------------------Tie HPS Components and Signals ---------------------------------------
 	u0 : component hps
 	port map (
 		clk_clk                         => CLOCK_50,                         --                     clk.clk
@@ -295,15 +297,15 @@ begin
 		de10_vga_raster_sprites_0_vga_vs_export    => VGA_VS,    --    de10_vga_raster_0_vga_vs.export
 		de10_vga_raster_sprites_0_vga_sync_export  => vga_sync,   --  de10_vga_raster_0_vga_sync.export
 		button_external_connection_export			=> KEY(3 downto 0),
-		switch_external_connection_export			=> SW(9 downto 0)
+		switch_external_connection_export			=> SW(9 downto 0),
+		de10_vga_raster_sprites_0_switchbuttons_new_signal => SwiBut(15 downto 0)
 
 	);
-	
+-----------------------------------------------------------------------------------------------------------------
 	VGA_BLANK_N <= vga_blank;
 	VGA_SYNC_N <= vga_sync;
-
-	--Endianness of 7-segment module is swapped!
-	
+-----------------------------------------------------------------------------------------------------------------
+-------------------------Seven Segment Displasys *This section is not really need--------------------------------
 	hex0_hps : component sevenseg
 	port map(
 		BININ 	=>	hex0_hps_bin(0) & hex0_hps_bin(1) & hex0_hps_bin(2) & hex0_hps_bin(3),
@@ -339,10 +341,14 @@ begin
 		BININ 	=>	hex5_hps_bin(0) & hex5_hps_bin(1) & hex5_hps_bin(2) & hex5_hps_bin(3),
 		HEX 		=>	HEX5(6 downto 0)
 	);
-			  
-	--map unused LEDs to something
-	LEDR(9 downto 0) <= "0000000000";
+-----------------------------------------------------------------------------------------------------------------			
+	
+	--Tied LEDS to Switch Positions
+	LEDR(9 downto 0) <= SW(9 downto 0);
+	-- Create signal based on switches and buttons (Blank last two bits)
+	SwiBut <= SW(9 downto 0) & KEY(3 downto 0) & "00";
 
 
+	
 end rtl;
 

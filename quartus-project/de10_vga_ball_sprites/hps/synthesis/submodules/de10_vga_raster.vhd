@@ -9,6 +9,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.package_types.all;
+
 
 entity de2_vga_raster is
   
@@ -39,39 +41,21 @@ end de2_vga_raster;
 
 architecture rtl of de2_vga_raster is
 	
-	component grebal_vga8_20x20 is
-	port (
-		clk, en : in std_logic;
-		addr : in unsigned(8 downto 0);
-		data : out unsigned(27 downto 0));
-	end component;
+	-- Cell simulation
+	signal states : array_states;
+	signal start_as : array_states := (others => (others => '0')); -- Initialize most of start_as as 0 so I can pick which ones to turn on
+	signal enable	: std_logic	:=	'1';
+	signal clk_div_ctrl : unsigned(2 downto 0);
+	signal sim_reset : std_logic := '1'; -- hacky but needed
 	
-	component whibal_vga8_20x20 is
-	port (
-		clk, en : in std_logic;
-		addr : in unsigned(8 downto 0);
-		data : out unsigned(27 downto 0));
-	end component;
-	
-	component redtri_vga8_20x20 is
-	port (
-		clk, en : in std_logic;
-		addr : in unsigned(8 downto 0);
-		data : out unsigned(27 downto 0));
-	end component;
-	
-	component pursta_vga8_20x20 is
-	port (
-		clk, en : in std_logic;
-		addr : in unsigned(8 downto 0);
-		data : out unsigned(27 downto 0));
-	end component;
-	
-	component rainbo_vga8_20x20 is
-	port (
-		clk, en : in std_logic;
-		addr : in unsigned(8 downto 0);
-		data : out unsigned(27 downto 0));
+	component cell_simulation is port(
+		clk 			:	in std_logic;
+		reset 			: 	in std_logic;
+		start_as_arr	:	in array_states;
+		enable			:	in std_logic;
+		clk_div_ctrl	:	in unsigned(2 downto 0);
+	    states 			: 	inout array_states
+	);
 	end component;
 	
 	-- Video parameters
@@ -88,132 +72,77 @@ architecture rtl of de2_vga_raster is
 	constant VACTIVE      : integer := 480;
 	constant VFRONT_PORCH : integer := 10;
 
-	--  constant RECTANGLE_HSTART : integer := 100;
-	--  constant RECTANGLE_HEND   : integer := 540;
-	--  constant RECTANGLE_VSTART : integer := 100;
-	--  constant RECTANGLE_VEND   : integer := 380;
 
 	-- Signals for the video controller
 	signal Hcount : unsigned(9 downto 0);-- := 200;  -- Horizontal position (0-800)
 	signal Vcount : unsigned(9 downto 0);-- := 200;  -- Vertical position (0-524)
+	signal CellX, CellY : unsigned(9 downto 0);
+	
 	signal EndOfLine, EndOfField : std_logic;
 
 	signal vga_hblank, vga_hsync, vga_vblank, vga_vsync : std_logic := '0';  -- Sync. signals
 
-	--signal rectangle_h, rectangle_v, rectangle : std_logic;  -- rectangle area
-	signal sprite_x, sprite_y : unsigned (9 downto 0) := "0011110000"; -- 240
-
-	signal sprite_addr_cnt : unsigned(8 downto 0) := (others => '0');
-	--signal x_addr, y_addr : unsigned (9 downto 0) := (others => '0');
-	signal area_x, area_y, spr_area, spr_load : std_logic := '0'; -- flags to control whether or not it's time to display our sprite
-
-	-- Sprite data interface
-	signal spr_address : unsigned (8 downto 0) := (others => '0');
-	signal which_spr : unsigned(15 downto 0) := "0000000000000001";
-	--signal spr_select : std_logic_vector(3 downto 0) := "0000";
-	signal spr_data : unsigned(27 downto 0) := (others => '0');
-	signal sprite0_data, sprite1_data, sprite2_data, sprite3_data, sprite4_data : unsigned(27 downto 0) := (others => '0');
-	constant sprlen_x, sprlen_y : integer := 20; -- length and width of sprite(s)
-	signal mult_result : unsigned (19 downto 0) := (others => '0');
-
 	-- need to clock at about 25 MHz for NTSC VGA
 	signal clk_25 : std_logic := '0';
+	signal cell_alive : std_logic := '0';
 begin
 	
-	-- Instantiate connections to various sprite memories
-	green_ball_inst : grebal_vga8_20x20 port map(
-		clk => clk_25,
-		en => spr_area,
-		addr => spr_address,
-		data => sprite0_data
+	-- Set up start_as ROMstart_as(25, 2) <= '1';
+	start_as(23, 3) <= '1';
+	start_as(25, 3) <= '1';
+	start_as(13, 4) <= '1';
+	start_as(14, 4) <= '1';
+	start_as(21, 4) <= '1';
+	start_as(22, 4) <= '1';
+	start_as(35, 4) <= '1';
+	start_as(36, 4) <= '1';
+	start_as(12, 5) <= '1';
+	start_as(16, 5) <= '1';
+	start_as(21, 5) <= '1';
+	start_as(22, 5) <= '1';
+	start_as(35, 5) <= '1';
+	start_as(36, 5) <= '1';
+	start_as(1, 6) <= '1';
+	start_as(2, 6) <= '1';
+	start_as(11, 6) <= '1';
+	start_as(17, 6) <= '1';
+	start_as(21, 6) <= '1';
+	start_as(22, 6) <= '1';
+	start_as(1, 7) <= '1';
+	start_as(2, 7) <= '1';
+	start_as(11, 7) <= '1';
+	start_as(15, 7) <= '1';
+	start_as(17, 7) <= '1';
+	start_as(18, 7) <= '1';
+	start_as(23, 7) <= '1';
+	start_as(25, 7) <= '1';
+	start_as(11, 8) <= '1';
+	start_as(17, 8) <= '1';
+	start_as(25, 8) <= '1';
+	start_as(12, 9) <= '1';
+	start_as(16, 9) <= '1';
+	start_as(13, 10) <= '1';
+	start_as(14, 10) <= '1';
+	
+	clk_div_ctrl <= writedata(14) & writedata(13) & writedata(12);
+	
+	-- Create the simulation component
+	sim : cell_simulation port map (
+		clk, sim_reset, start_as, enable, clk_div_ctrl, states
 	);
-	
-	white_ball_inst : whibal_vga8_20x20 port map(
-		clk => clk_25,
-		en => spr_area,
-		addr => spr_address,
-		data => sprite1_data
-	);
-	
-	red_triangle_inst : redtri_vga8_20x20 port map(
-		clk => clk_25,
-		en => spr_area,
-		addr => spr_address,
-		data => sprite2_data
-	);
-	
-	purple_star_inst : pursta_vga8_20x20 port map(
-		clk => clk_25,
-		en => spr_area,
-		addr => spr_address,
-		data => sprite3_data
-	);
-	
-	rainbo_inst : rainbo_vga8_20x20 port map(
-		clk => clk_25,
-		en => spr_area,
-		addr => spr_address,
-		data => sprite4_data
-	);
-	
-	
-	
-	
-	
+
+
 	-- set up 25 MHz clock
 	process (clk)
 	begin
 		if rising_edge(clk) then
 			clk_25 <= not clk_25;
-		end if;
-	end process;
-	
-	-- Write current location of sprite center
-	Location_Write : process (clk_25)
-	--variable sprite_y, sprite_x : unsigned(9 downto 0);
-	begin
-	
-		if rising_edge(clk_25) then
-			if reset = '1' then
-				readdata <= (others => '0');
-				sprite_y <= "0011110000"; -- 240
-				sprite_x <= "1000011100"; --540
-			
-			elsif chipselect = '1' then
-				if read = '1' then
-					if address= "0000" then
-						readdata <=  "000000000000000" & (vga_vsync or vga_hsync);
-					elsif address= "0001" then
-						readdata <=  "000000" & std_logic_vector(sprite_y);
-					elsif address = "0010" then
-						readdata <=  "000000" & std_logic_vector(sprite_x);
-					else 
-						readdata <= "0000000000001010";
-					end if;
-				end if;
-				if write = '1' then
-					if address = "0011" then
-						sprite_y <= unsigned(writedata(9 downto 0)); --y
-						sprite_x <= sprite_x;
-						which_spr <= which_spr;
-					elsif address = "0100" then	
-						sprite_y <= sprite_y;
-						sprite_x <= unsigned(writedata(9 downto 0)); --x
-						which_spr <= which_spr;
-					elsif address = "0101" then
-						sprite_y <= sprite_y;
-						sprite_x <= sprite_x;
-						which_spr <= (unsigned(writedata(15 downto 0)));
-					else 
-						sprite_y <= sprite_y;
-						sprite_x <= sprite_x;
-						which_spr <= which_spr;
-					end if;
-				end if;
+			if sim_reset = '1' then
+				sim_reset <= '0';
 			end if;
 		end if;
-	end process Location_Write;
-
+	end process;
+	sim_reset <= writedata(1);
 	-- Horizontal and vertical counters
 
 	HCounter : process (clk_25)
@@ -225,7 +154,7 @@ begin
 			  Hcount <= (others => '0');
 			else
 			  Hcount <= Hcount + 1;
-			end if;      
+			end if;
 		end if;
 	end process HCounter;
 
@@ -304,99 +233,15 @@ begin
 		end if;
 	end process VBlankGen;
 
-	-- Sprite generator
-	Sprite_X_Check : process(clk_25)
+	CellChecker : process (clk_25)
 	begin
 		if rising_edge(clk_25) then
-			if reset = '1' or (Hcount >= (sprite_x) and Hcount < (sprite_x + sprlen_x)) then
-				area_x <= '1';
-			else
-				area_x <= '0';
-			end if;
-		
+			CellX <= shift_right(Hcount + HBACK_PORCH, 4);
+			CellY <= shift_right(Vcount + VBACK_PORCH, 4);
+			cell_alive <= states(to_integer(CellX), to_integer(CellY));
 		end if;
-	end process Sprite_X_Check;
+	end process CellChecker;
 	
-	Sprite_Y_Check : process(clk_25)
-	begin
-		if rising_edge(clk_25) then
-			if reset = '1' then
-				area_y <= '0'; -- changed from '1'
-			elsif EndOfLine = '1' then
-				if Vcount >= (sprite_y) and Vcount < (sprite_y + sprlen_y) then
-					area_y <= '1';
-				else
-					area_y <= '0';
-				end if;
-				
-			end if;
-		
-		end if;
-	end process Sprite_Y_Check;
-	
---	Sprite_Valid : process(clk_25)
---	begin
---		if rising_edge(clk_25) then
---			if reset = '1' then
---				spr_area <= '0';
---			elsif (area_x = '1' and area_y = '1') then
---				spr_area <= '1';
---			else
---				spr_area <= '0';
---			end if;
---		
---		end if;
---	end process Sprite_Valid;
-	
-	spr_area <= area_x and area_y;
-	
-	Sprite_Load_Process : process (clk_25)
-	begin
-		if reset = '1' then
-			spr_load <= '0';
-		else
-			if rising_edge(clk_25) then
-				if spr_area = '1' then
-					spr_load <= '1';
-				else
-					spr_load <= '0';
-				end if;
-			end if;
-		end if;
-	
-	end process Sprite_Load_Process;
-	
---	Sprite_Address : process (clk_25)
---		--variable mult_result : unsigned(19 downto 0);
---	begin
---		if rising_edge(clk_25) then
---			if reset = '1' then
---				spr_address <= (others => '0');
---			else
---				mult_result <= (Vcount-sprite_y)*sprlen_y+(Hcount-sprite_x);
---				if mult_result > "110001111" then
---					spr_address <= (others => '0');
---				else
---					spr_address <= mult_result(8 downto 0);
---				end if;
---				
---			end if;
---		
---		end if;
---	
---	end process Sprite_address;
-	mult_result <= (Vcount-sprite_y-1)*sprlen_y+(Hcount-sprite_x-1); -- minus 1 in horiz and vert deals with off-by-one behavior in valid area check; not sim as of 2/23 2AM
-	spr_address <= mult_result(8 downto 0);
-	
-	-- comb logic to select sprite ROM data
-	with which_spr(3 downto 0) select
-		spr_data <= sprite0_data when "0001",
-						sprite1_data when "0010",
-						sprite2_data when "0100",
-						sprite3_data when "1000",
-						sprite4_data when "1001",
-						(others => '0') when others;
-						
 	-- Registered video signals going to the video DAC
 
 	VideoOut : process (clk_25, reset)
@@ -406,18 +251,34 @@ begin
 			VGA_G <= "00000000";
 			VGA_B <= "00000000";
 		elsif clk_25'event and clk_25 = '1' then
-			if spr_load = '1' and spr_data(24) = '0' then
+			if cell_alive = '1' then
 				VGA_R <= "11111111";
 				VGA_G <= "11111111";
 				VGA_B <= "11111111";
-			elsif vga_hblank = '0' and vga_vblank = '0' then
+			elsif cell_alive = '-' then
 				VGA_R <= "00000000";
+				VGA_G <= "11111111";
+				VGA_B <= "11111111";
+			elsif cell_alive = 'U' then
+				VGA_R <= "11111111";
 				VGA_G <= "00000000";
 				VGA_B <= "11111111";
+			elsif cell_alive = 'X' then
+				VGA_R <= "11111111";
+				VGA_G <= "11111111";
+				VGA_B <= "00000000";
+			elsif cell_alive = '0' then
+				VGA_R <= "00000000";
+				VGA_G <= "00000000";
+				VGA_B <= "00000000";
+			elsif vga_hblank = '0' and vga_vblank = '0' then
+				VGA_R <= "00000000";
+				VGA_G <= "11111111";
+				VGA_B <= "00000000";
 			else
 				VGA_R <= "00000000";
 				VGA_G <= "00000000";
-				VGA_B <= "00000000";    
+				VGA_B <= "11111111";    
 			end if;
 	end if;
 	end process VideoOut;

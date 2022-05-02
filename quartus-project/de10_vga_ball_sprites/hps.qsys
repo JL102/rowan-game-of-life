@@ -191,6 +191,14 @@
          type = "String";
       }
    }
+   element hps
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
    element hps_0
    {
       datum _sortIndex
@@ -242,6 +250,11 @@
    type="conduit"
    dir="end" />
  <interface name="clk" internal="clk_0.clk_in" type="clock" dir="end" />
+ <interface
+   name="de10_vga_raster_sprites_0_switchbuttons"
+   internal="de10_vga_raster_sprites_0.SwitchButtons"
+   type="conduit"
+   dir="end" />
  <interface
    name="de10_vga_raster_sprites_0_vga_b"
    internal="de10_vga_raster_sprites_0.vga_b"
