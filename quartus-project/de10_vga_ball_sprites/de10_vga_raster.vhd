@@ -82,6 +82,15 @@ architecture rtl of de2_vga_raster is
 	signal clk_25 : std_logic := '0';
 	signal cell_alive : std_logic := '0';
 	signal sim_clk : std_logic;
+	-- For zooming 
+	signal div_amount : signed(3 downto 0) := "0011";
+	-- For panning
+	signal horiz_add : unsigned(9 downto 0) := (others => '0'); 
+	signal vert_add : unsigned(9 downto 0) := (others => '0');
+	-- for debouncing zoom/pan buttons & detecting high only once
+	-- signal btn_counter : unsigned(7 downto 0) := (others => '0'); 
+	signal btn_counter : std_logic := '0';
+	signal doZoomOrPan, isLeftOrRight : std_logic := '0';
 	
 	-------------------------------------------------------------------------------
 begin
@@ -131,14 +140,66 @@ begin
 	enable <= SwitchButtons_signal(6); -- (Configured currently as "pause") 
 	----------------------------------------------------------------------------------------------
 	
+	-- [15-13: zoom] [12,11: x/y/zoom] ... [7: manual/auto] [6: play/pause]
+	-- [5,4: zoom/pan] [3: reset] [2: manual button]
+	
+	------------------- Switcher between manual and auto mode ------------------------------------
 	process (SwitchButtons_signal, clk)
 	begin
 		if SwitchButtons_signal(7) = '1' then
 			sim_clk <= clk; -- Auto mode
 		else 
-			sim_clk <= not SwitchButtons_signal(7); -- Manual mode
+			sim_clk <= not SwitchButtons_signal(2); -- Manual mode
 		end if;
 	end process;
+	
+	------------------ Zoom/pan control ----------------------------------------------------------
+	process( doZoomOrPan )
+	begin
+		if rising_edge( doZoomOrPan ) then
+			-- Left
+			if isLeftOrRight = '1' then
+				if SwitchButtons_signal(12) = '1' then -- X movement
+					horiz_add <= horiz_add - 32; -- move LEFT
+				elsif SwitchButtons_signal(11) = '1' then -- Y movement
+					vert_add <= vert_add + 32; -- move DOWN
+				else -- zoom
+					div_amount <= div_amount - 1; -- zoom IN
+				end if;
+			-- Right
+			else 
+				if SwitchButtons_signal(12) = '1' then -- X movement
+					horiz_add <= horiz_add + 32; -- move RIGHT
+				elsif SwitchButtons_signal(11) = '1' then -- Y movement
+					vert_add <= vert_add - 32; -- move UP
+				else
+					div_amount <= div_amount + 1; -- zoom OUT
+				end if;
+			end if;
+		end if;
+	end process;
+	
+	isLeftOrRight <= not SwitchButtons_signal(5); -- 1 if left button, 0 if right button
+	
+	HandleZoomPanPress : process( clk, SwitchButtons_signal )
+	begin
+		if rising_edge(clk) then
+			-- either button on
+			if SwitchButtons_signal(5) = '0' or SwitchButtons_signal(4) = '0' then
+				
+				if btn_counter = '1' then
+					doZoomOrPan <= '1'; -- finally enable doZoomOrPan
+				else 
+					btn_counter <= '1'; -- set to 1 if not already
+				end if;
+			-- both buttons off
+			else
+				-- disable doZoomOrPan and reset btn_counter
+				btn_counter <= '0';
+				doZoomOrPan <= '0';
+			end if;
+		end if;
+	end process ; -- HandleZoomPanPress
 	
 	-- Create the simulation component
 	sim : cell_simulation port map (
@@ -246,12 +307,13 @@ begin
 			end if;
 		end if;
 	end process VBlankGen;
--------------------------------------------------------------------------------
+	------------------- Checks the state of each cell --------------------------------------------
 	CellChecker : process (clk_25)
 	begin
 		if rising_edge(clk_25) then
-			CellX <= shift_right(Hcount + HBACK_PORCH, 5);
-			CellY <= shift_right(Vcount + VBACK_PORCH, 5);
+			-- Uses a bitshift to zoom in/out, i.e. divide the x and y coordinate by 
+			CellX <= shift_right(Hcount + HBACK_PORCH + horiz_add, to_integer(div_amount));
+			CellY <= shift_right(Vcount + VBACK_PORCH + vert_add,  to_integer(div_amount));
 			cell_alive <= states(to_integer(CellX), to_integer(CellY));
 		end if;
 	end process CellChecker;
@@ -271,18 +333,18 @@ begin
 				VGA_R <= "11111111";
 				VGA_G <= "11111111";
 				VGA_B <= "11111111";
-			elsif cell_alive = '-' then
-				VGA_R <= "00000000"; -- Used for troubleshooting
-				VGA_G <= "11111111";
-				VGA_B <= "11111111";
-			elsif cell_alive = 'U' then
-				VGA_R <= "11111111"; -- Used for troubleshooting
-				VGA_G <= "00000000";
-				VGA_B <= "11111111";
-			elsif cell_alive = 'X' then
-				VGA_R <= "11111111"; -- Used for troubleshooting
-				VGA_G <= "11111111";
-				VGA_B <= "00000000";
+			-- elsif cell_alive = '-' then
+			-- 	VGA_R <= "00000000"; -- Used for troubleshooting
+			-- 	VGA_G <= "11111111";
+			-- 	VGA_B <= "11111111";
+			-- elsif cell_alive = 'U' then
+			-- 	VGA_R <= "11111111"; -- Used for troubleshooting
+			-- 	VGA_G <= "00000000";
+			-- 	VGA_B <= "11111111";
+			-- elsif cell_alive = 'X' then
+			-- 	VGA_R <= "11111111"; -- Used for troubleshooting
+			-- 	VGA_G <= "11111111";
+			-- 	VGA_B <= "00000000";
 			elsif cell_alive = '0' then
 				VGA_R <= "00000000"; -- Cell is dead, black pixel
 				VGA_G <= "00000000";
